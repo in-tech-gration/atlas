@@ -45,6 +45,19 @@ tcp/ip internet protocol suite transmission control protocol user datagram proto
 ---
 
 ```bash
+atlas pattern ai "What is the -s parameter in cURL?"
+```
+
+Output:
+
+```markdown
+* The `-s` parameter in `cURL` stands for silent mode.
+* It prevents cURL from showing its progress meter and messages.
+* Silent mode suppresses informational output.
+```
+---
+
+```bash
 echo "USA and EU" | atlas pattern explain_terms
 ```
 
