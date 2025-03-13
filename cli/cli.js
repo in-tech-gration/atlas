@@ -14,25 +14,20 @@ const chatModel = new ChatOllama({
 
 export default class CLI {
 
-  constructor({ version }){
+  constructor({ version }) {
     this.version = version;
   }
 
-  init(){
+  init() {
 
     const program = new Command();
 
     program
       .name("atlas")
       .description("atlas-fabric is an open-source framework for augmenting humans using AI.")
-      .version(this.VERSION);
-    
-    program.command('pattern')
-      .description('Choose a pattern from the available patterns')
       // -p, --pattern              Choose a pattern from the available patterns
-      .argument('<pattern>', 'Choose a pattern from the available patterns')
-      .argument('[model]', 'Choose model')
-
+      .option('-p, --pattern <pattern...>', 'Choose a pattern from the available patterns')
+      .option('-m, --model [model]', 'Choose model')
       // TODO:
       // -t, --temperature=         Set temperature (default: 0.7)
       // -s, --stream               Stream
@@ -40,57 +35,72 @@ export default class CLI {
       // -L, --listmodels           List all available models
       // -o, --output=              Output to file
       // -c, --copy                 Copy to clipboard
+      .version(this.VERSION)
 
-      .action((pattern, data) => {
+    let stdin = "";
 
-          if ( !data && !stdin ){
-            return console.log("Please provide some content.");
-          }
+    if (process.stdin.isTTY) {
 
-          const filePath = path.join(PATTERNS_DIR, pattern, "system.md");
+      program.parse(process.argv);
+      const options = program.opts();
+      this.execute({ options, program });
 
-          fs.access(filePath)
-          .then(() => fs.readFile(filePath, "utf8"))
-          .then(async (content) => {
-
-            const prompt = ChatPromptTemplate.fromMessages([
-              ["system", content],
-              ["human", stdin ? stdin : data],
-            ]);
-
-            const parser = new StringOutputParser();
-            const chain = prompt.pipe(chatModel).pipe(parser); 
-            console.log( await chain.invoke() );
-
-          })
-          .catch((error) => {
-            console.log("File does not exist.", error);
-          });
-          
-      });
-    
-      let stdin = "";
-
-      if ( process.stdin.isTTY ) {
-        
-        program.parse(process.argv);
-        
       // HANDLE PIPED CONTENT: cat file.txt | atlas -p pattern
       // https://github.com/tj/commander.js/issues/137
-      } else {
-  
-        process.stdin.on("readable", function() {
-            let chunk = this.read();
-            if ( chunk !== null ) {
-              stdin += chunk;
-            }
-        });
-        process.stdin.on("end", function() {
-          program.parse(process.argv); 
-        });
-  
+    } else {
+
+      process.stdin.on("readable", () => {
+        let chunk = process.stdin.read();
+        if (chunk !== null) {
+          stdin += chunk;
+        }
+      });
+      process.stdin.on("end", () => {
+        program.parse(process.argv);
+        const options = program.opts();
+        this.execute({ options, program, stdin });
+      });
+
+    }
+
+  }
+
+  execute({ options, program, stdin }) {
+
+    if (options.pattern) {
+
+      const [pattern, data] = options.pattern;
+
+      if (!data && !stdin) {
+        return console.log("Please provide some content.");
       }
-      
+
+      const filePath = path.join(PATTERNS_DIR, pattern, "system.md");
+
+      fs.access(filePath)
+        .then(() => fs.readFile(filePath, "utf8"))
+        .then(async (content) => {
+
+          const prompt = ChatPromptTemplate.fromMessages([
+            ["system", content],
+            ["human", stdin ? stdin : data],
+          ]);
+
+          const parser = new StringOutputParser();
+          const chain = prompt.pipe(chatModel).pipe(parser);
+          console.log(await chain.invoke());
+
+        })
+        .catch((error) => {
+          console.log("File does not exist.", error);
+        });
+
+    } else {
+
+      program.help();
+
+    }
+
   }
 
 }

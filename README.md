@@ -33,7 +33,9 @@ Examples using [Llama 3.1](https://ai.meta.com/blog/meta-llama-3-1/) model:
 _(Requires [Ollama](https://ollama.com/))_
 
 ```bash
-cat example.txt | atlas pattern create_tags                               
+cat example.txt | atlas --pattern create_tags
+# or                               
+cat example.txt | atlas -p create_tags
 ```
 
 Output:
@@ -45,7 +47,9 @@ tcp/ip internet protocol suite transmission control protocol user datagram proto
 ---
 
 ```bash
-atlas pattern ai "What is the -s parameter in cURL?"
+atlas --pattern ai "What is the -s parameter in cURL?"
+# or
+atlas -p ai "What is the -s parameter in cURL?"
 ```
 
 Output:
@@ -58,7 +62,7 @@ Output:
 ---
 
 ```bash
-echo "USA and EU" | atlas pattern explain_terms
+echo "USA and EU" | atlas --pattern explain_terms
 ```
 
 Output:
@@ -76,13 +80,13 @@ However, the provided input appears more related to general geography or global 
 Alternative input strategy: 
 
 ```bash
-atlas pattern explain_terms "USA and EU"
+atlas --pattern explain_terms "USA and EU"
 ```
 
 ---
 
 ```bash
-cat example.txt | atlas pattern explain_terms
+cat example.txt | atlas -p explain_terms
 ```
 
 Output:
@@ -112,7 +116,7 @@ A technical standards organization responsible for maintaining and developing th
 
 Options:
 
-- [ ] `-p, --pattern              Choose a pattern from the available patterns`
+- [x] `-p, --pattern              Choose a pattern from the available patterns`
 - [ ] `-t, --temperature=         Set temperature (default: 0.7)`
 - [ ] `-s, --stream               Stream`
 - [ ] `-l, --listpatterns         List all patterns`
