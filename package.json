@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A Node.js implementation of fabric",
   "main": "main.js",
+  "type": "module",
   "bin": {
     "atlas": "main.js"
   },
@@ -13,11 +14,17 @@
     "type": "git",
     "url": "git+https://github.com/in-tech-gration/atlas.git"
   },
-  "keywords": ["atlas"],
+  "keywords": [
+    "atlas"
+  ],
   "author": "kostasx",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/in-tech-gration/atlas/issues"
   },
-  "homepage": "https://github.com/in-tech-gration/atlas#readme"
+  "homepage": "https://github.com/in-tech-gration/atlas#readme",
+  "dependencies": {
+    "@langchain/ollama": "^0.2.0",
+    "commander": "^13.1.0"
+  }
 }
