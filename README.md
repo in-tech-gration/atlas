@@ -86,7 +86,9 @@ atlas --pattern explain_terms "USA and EU"
 ---
 
 ```bash
-cat example.txt | atlas -p explain_terms
+cat example.txt | atlas -p explain_terms -t 0
+# or
+cat example.txt | atlas --pattern explain_terms --temperature 0
 ```
 
 Output:
