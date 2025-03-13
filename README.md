@@ -16,6 +16,11 @@ A Node.js implementation **(beta)** of [fabric](https://github.com/danielmiessle
   - `npm link`
   - `atlas --help`
 
+  **Prerequisites:**
+
+  - Install [Ollama](https://ollama.com/)
+  - Run `Ollama` and install `llama3.1:latest` model
+
 ## EXAMPLES:
 
 Examples using [Llama 3.1](https://ai.meta.com/blog/meta-llama-3-1/) model:
