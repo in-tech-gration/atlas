@@ -1,6 +1,6 @@
 # ATLAS-FABRIC
 
-A Node.js implementation of [fabric](https://github.com/danielmiessler/fabric/) **(in Beta)**.
+A Node.js implementation **(beta)** of [fabric](https://github.com/danielmiessler/fabric/) using [LangChain](https://js.langchain.com/docs/introduction/).
 
 <p class="align center">
 <h4><code>fabric</code> is an open-source framework for augmenting humans using AI.</h4>
