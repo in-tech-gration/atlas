@@ -1,0 +1,23 @@
+{
+  "name": "atlas-fabric",
+  "version": "0.1.0",
+  "description": "A Node.js implementation of fabric",
+  "main": "main.js",
+  "bin": {
+    "atlas": "main.js"
+  },
+  "scripts": {
+    "postinstall": "echo 'Installed Atlas CLI!'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/in-tech-gration/atlas.git"
+  },
+  "keywords": ["atlas"],
+  "author": "kostasx",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/in-tech-gration/atlas/issues"
+  },
+  "homepage": "https://github.com/in-tech-gration/atlas#readme"
+}
