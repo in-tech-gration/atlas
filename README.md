@@ -8,6 +8,14 @@ A Node.js implementation **(beta)** of [fabric](https://github.com/danielmiessle
 
 **NOTE:** Work in progress. Under heavy development.
 
+## INSTALLATION
+
+  - `git clone git@github.com:in-tech-gration/atlas.git`
+  - `cd atlas`
+  - `npm install`
+  - `npm link`
+  - `atlas --help`
+
 ## EXAMPLES:
 
 Examples using [Llama 3.1](https://ai.meta.com/blog/meta-llama-3-1/) model:
