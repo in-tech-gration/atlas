@@ -85,6 +85,8 @@ atlas pattern explain_terms "USA and EU"
 cat example.txt | atlas pattern explain_terms
 ```
 
+Output:
+
 ```markdown
 ## ABSTRACTION LAYER: 
 A layer of the Internet protocol suite that provides a conceptual separation between different network functions and protocols, allowing for classification and organization.
@@ -110,7 +112,7 @@ A technical standards organization responsible for maintaining and developing th
 
 Options:
 
-- [x] `-p, --pattern              Choose a pattern from the available patterns`
+- [ ] `-p, --pattern              Choose a pattern from the available patterns`
 - [ ] `-t, --temperature=         Set temperature (default: 0.7)`
 - [ ] `-s, --stream               Stream`
 - [ ] `-l, --listpatterns         List all patterns`
