@@ -93,6 +93,10 @@ A technical standards organization responsible for maintaining and developing th
 
 ## TODO
 
+- [ ] Publish on NPM
+
+Options:
+
 - [x] `-p, --pattern              Choose a pattern from the available patterns`
 - [ ] `-t, --temperature=         Set temperature (default: 0.7)`
 - [ ] `-s, --stream               Stream`
