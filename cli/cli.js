@@ -7,11 +7,6 @@ import path from "path";
 
 const PATTERNS_DIR = "patterns";
 
-const chatModel = new ChatOllama({
-  baseUrl: "http://localhost:11434",
-  model: "llama3.1:latest",
-});
-
 export default class CLI {
 
   constructor({ version }) {
@@ -27,9 +22,11 @@ export default class CLI {
       .description("atlas-fabric is an open-source framework for augmenting humans using AI.")
       // -p, --pattern              Choose a pattern from the available patterns
       .option('-p, --pattern <pattern...>', 'Choose a pattern from the available patterns')
+      // -t, --temperature=         Set temperature (default: 0.7)
+      .option('-t, --temperature [temperature]', 'Set temperature (default: 0.7)')
+      // -m, --model
       .option('-m, --model [model]', 'Choose model')
       // TODO:
-      // -t, --temperature=         Set temperature (default: 0.7)
       // -s, --stream               Stream
       // -l, --listpatterns         List all patterns
       // -L, --listmodels           List all available models
@@ -65,6 +62,21 @@ export default class CLI {
 
   }
 
+  initLLM(options){
+
+    const defaults = { model: "llama3.1:latest", temperature: 0.7 }
+    const { model, temperature } = Object.assign( defaults, options );
+
+    const chatModel = new ChatOllama({
+      baseUrl: "http://localhost:11434",
+      model,
+      temperature
+    });
+
+    this.chatModel = chatModel;
+    
+  }
+
   execute({ options, program, stdin }) {
 
     if (options.pattern) {
@@ -86,8 +98,16 @@ export default class CLI {
             ["human", stdin ? stdin : data],
           ]);
 
+          const llmOptions = {}
+
+          if ( "temperature" in options ){
+            llmOptions.temperature = parseFloat(options.temperature);
+          }
+
+          this.initLLM(llmOptions);
+          
           const parser = new StringOutputParser();
-          const chain = prompt.pipe(chatModel).pipe(parser);
+          const chain = prompt.pipe(this.chatModel).pipe(parser);
           console.log(await chain.invoke());
 
         })

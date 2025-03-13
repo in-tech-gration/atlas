@@ -117,7 +117,7 @@ A technical standards organization responsible for maintaining and developing th
 Options:
 
 - [x] `-p, --pattern              Choose a pattern from the available patterns`
-- [ ] `-t, --temperature=         Set temperature (default: 0.7)`
+- [x] `-t, --temperature=         Set temperature (default: 0.7)`
 - [ ] `-s, --stream               Stream`
 - [ ] `-l, --listpatterns         List all patterns`
 - [ ] `-L, --listmodels           List all available models`
