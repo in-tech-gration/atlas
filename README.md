@@ -1,3 +1,9 @@
+# ATLAS-FABRIC
+
+A Node.js implementation of [fabric](https://github.com/danielmiessler/fabric/).
+
+**NOTE:** Work in progress. Under heavy development.
+
 ## EXAMPLES:
 
 Example using [Llama 3.1](https://ai.meta.com/blog/meta-llama-3-1/) model:
@@ -48,3 +54,13 @@ A technical standards organization responsible for maintaining and developing th
 
 ... (truncated)
 ```
+
+## TODO
+
+- [x] `-p, --pattern              Choose a pattern from the available patterns`
+- [ ] `-t, --temperature=         Set temperature (default: 0.7)`
+- [ ] `-s, --stream               Stream`
+- [ ] `-l, --listpatterns         List all patterns`
+- [ ] `-L, --listmodels           List all available models`
+- [ ] `-o, --output=              Output to file`
+- [ ] `-c, --copy                 Copy to clipboard`
