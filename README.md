@@ -8,6 +8,8 @@ A Node.js implementation **(beta)** of [fabric](https://github.com/danielmiessle
 
 **NOTE:** Work in progress. Under heavy development.
 
+**What is Fabric?** Check out the [Introducing Fabric — A Human AI Augmentation Framework](https://www.youtube.com/watch?v=wPEyyigh10g) video by the original creator Daniel Meissler.
+
 ## INSTALLATION
 
   - `git clone git@github.com:in-tech-gration/atlas.git`
