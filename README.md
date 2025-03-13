@@ -2,11 +2,29 @@
 
 A Node.js implementation of [fabric](https://github.com/danielmiessler/fabric/).
 
+<p class="align center">
+<h4><code>fabric</code> is an open-source framework for augmenting humans using AI.</h4>
+</p>
+
 **NOTE:** Work in progress. Under heavy development.
 
 ## EXAMPLES:
 
-Example using [Llama 3.1](https://ai.meta.com/blog/meta-llama-3-1/) model:
+Examples using [Llama 3.1](https://ai.meta.com/blog/meta-llama-3-1/) model:
+
+_(Requires [Ollama](https://ollama.com/))_
+
+```bash
+cat example.txt | atlas pattern create_tags                               
+```
+
+Output:
+
+```markdown
+tcp/ip internet protocol suite transmission control protocol user datagram protocol ip tcp udp ip address network segment host to host communication process to process data exchange department of defense darpa internet engineering task force ietf osi model
+```
+
+---
 
 ```bash
 echo "USA and EU" | atlas pattern explain_terms
@@ -30,7 +48,7 @@ Alternative input strategy:
 atlas pattern explain_terms "USA and EU"
 ```
 
-Example using [Llama 3.1](https://ai.meta.com/blog/meta-llama-3-1/) model with a text file as input:
+---
 
 ```bash
 cat example.txt | atlas pattern explain_terms
