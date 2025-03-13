@@ -104,3 +104,15 @@ Options:
 - [ ] `-L, --listmodels           List all available models`
 - [ ] `-o, --output=              Output to file`
 - [ ] `-c, --copy                 Copy to clipboard`
+
+---
+
+`fabric` was created by <a href="https://danielmiessler.com/subscribe" target="_blank">Daniel Miessler</a> in January of 2024.
+
+<br /><br />
+
+`atlas-fabric` was created by <a href="https://github.com/kostasx" target="_blank">Kostas Minaidis</a> in March of 2025.
+
+<br /><br />
+
+<a href="https://twitter.com/intent/user?screen_name=kostasx">![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/kostasx)</a>
