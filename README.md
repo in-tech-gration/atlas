@@ -128,6 +128,7 @@ A technical standards organization responsible for maintaining and developing th
 - [ ] Enable ESLint
 - [ ] Introduce Agentic workflows based on LangGraph
 - [ ] Integrate LLM APIs
+- [ ] Add Chat mode
 
 Options:
 

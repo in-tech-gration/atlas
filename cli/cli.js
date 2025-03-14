@@ -25,6 +25,7 @@ export default class CLI {
     program
       .name("atlas")
       .description("atlas-fabric is an open-source framework for augmenting humans using AI.")
+      // .option('--chat', 'Start a chat session') // WiP
       .option('-p, --pattern <pattern...>', 'Choose a pattern from the available patterns')
       .option('-t, --temperature [temperature]', 'Set temperature (default: 0.7)')
       .option('-m, --model [model]', 'Choose model')
@@ -87,6 +88,11 @@ export default class CLI {
       return listSubfolders(patternsDir);
 
     }
+
+    // WiP
+    // if (options.chat){
+    //   return console.log("Chatting...");
+    // }
 
     if (options.pattern) {
 
