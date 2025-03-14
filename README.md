@@ -123,6 +123,11 @@ A technical standards organization responsible for maintaining and developing th
 ## TODO
 
 - [ ] Publish on NPM
+- [ ] Port to TypeScript
+- [ ] Write Unit Tests
+- [ ] Enable ESLint
+- [ ] Introduce Agentic workflows based on LangGraph
+- [ ] Integrate LLM APIs
 
 Options:
 
