@@ -6,6 +6,7 @@ import { ChatOllama } from "@langchain/ollama";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { listSubfolders } from "../common/utils.js";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -101,11 +102,6 @@ export default class CLI {
         .then(() => fs.readFile(filePath, "utf8"))
         .then(async (content) => {
 
-          const prompt = ChatPromptTemplate.fromMessages([
-            ["system", content],
-            ["human", stdin ? stdin : data],
-          ]);
-
           const llmOptions = {}
 
           if ( "temperature" in options ){
@@ -113,10 +109,22 @@ export default class CLI {
           }
 
           this.initLLM(llmOptions);
-          
-          const parser = new StringOutputParser();
-          const chain = prompt.pipe(this.chatModel).pipe(parser);
-          console.log(await chain.invoke());
+
+          const response = await this.chatModel.invoke([
+              new SystemMessage(content),
+              new HumanMessage(stdin ? stdin : data)
+          ]);
+
+          console.log(response.content);
+
+          // [ DEPRECATED ] In favour of simpler invocation with plain text input (see above)
+          // const prompt = ChatPromptTemplate.fromMessages([
+          //   ["system", content],
+          //   ["human", stdin ? stdin : data],
+          // ]);
+          // const parser = new StringOutputParser();
+          // const chain = prompt.pipe(this.chatModel).pipe(parser);
+          // console.log(await chain.invoke());
 
         })
         .catch((error) => {
