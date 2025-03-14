@@ -7,6 +7,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { listSubfolders } from "../common/utils.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+// import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -25,6 +26,7 @@ export default class CLI {
     program
       .name("atlas")
       .description("atlas-fabric is an open-source framework for augmenting humans using AI.")
+      // .option("--calendar", "Experimental calendar feature") // WiP
       // .option('--chat', 'Start a chat session') // WiP
       .option('-p, --pattern <pattern...>', 'Choose a pattern from the available patterns')
       .option('-t, --temperature [temperature]', 'Set temperature (default: 0.7)')
@@ -65,10 +67,10 @@ export default class CLI {
 
   }
 
-  initLLM(options){
+  initLLM(options) {
 
     const defaults = { model: "llama3.1:latest", temperature: 0.7 }
-    const { model, temperature } = Object.assign( defaults, options );
+    const { model, temperature } = Object.assign(defaults, options);
 
     const chatModel = new ChatOllama({
       baseUrl: "http://localhost:11434",
@@ -77,12 +79,12 @@ export default class CLI {
     });
 
     this.chatModel = chatModel;
-    
+
   }
 
   execute({ options, program, stdin }) {
 
-    if (options.listpatterns){
+    if (options.listpatterns) {
 
       const patternsDir = path.join(__dirname, "..", PATTERNS_DIR);
       return listSubfolders(patternsDir);
@@ -92,6 +94,13 @@ export default class CLI {
     // WiP
     // if (options.chat){
     //   return console.log("Chatting...");
+    // }
+
+    // WiP
+    // if (options.calendar) {
+    //   console.log("Google Calendar:");
+    //   listCalendarEvents({ maxResults: 12 });
+    //   return;
     // }
 
     if (options.pattern) {
@@ -110,15 +119,15 @@ export default class CLI {
 
           const llmOptions = {}
 
-          if ( "temperature" in options ){
+          if ("temperature" in options) {
             llmOptions.temperature = parseFloat(options.temperature);
           }
 
           this.initLLM(llmOptions);
 
           const response = await this.chatModel.invoke([
-              new SystemMessage(content),
-              new HumanMessage(stdin ? stdin : data)
+            new SystemMessage(content),
+            new HumanMessage(stdin ? stdin : data)
           ]);
 
           console.log(response.content);

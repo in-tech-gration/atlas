@@ -129,6 +129,7 @@ A technical standards organization responsible for maintaining and developing th
 - [ ] Introduce Agentic workflows based on LangGraph
 - [ ] Integrate LLM APIs
 - [ ] Add Chat mode
+- [ ] Implement update functionality
 
 Options:
 
