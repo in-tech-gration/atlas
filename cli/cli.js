@@ -1,9 +1,13 @@
+import fs from "node:fs/promises";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
 import { Command } from "commander";
 import { ChatOllama } from "@langchain/ollama";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import fs from "node:fs/promises";
-import path from "path";
+import { listSubfolders } from "../common/utils.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const PATTERNS_DIR = "patterns";
 
@@ -20,15 +24,12 @@ export default class CLI {
     program
       .name("atlas")
       .description("atlas-fabric is an open-source framework for augmenting humans using AI.")
-      // -p, --pattern              Choose a pattern from the available patterns
       .option('-p, --pattern <pattern...>', 'Choose a pattern from the available patterns')
-      // -t, --temperature=         Set temperature (default: 0.7)
       .option('-t, --temperature [temperature]', 'Set temperature (default: 0.7)')
-      // -m, --model
       .option('-m, --model [model]', 'Choose model')
+      .option('-l, --listpatterns', 'List all patterns')
       // TODO:
       // -s, --stream               Stream
-      // -l, --listpatterns         List all patterns
       // -L, --listmodels           List all available models
       // -o, --output=              Output to file
       // -c, --copy                 Copy to clipboard
@@ -78,6 +79,13 @@ export default class CLI {
   }
 
   execute({ options, program, stdin }) {
+
+    if (options.listpatterns){
+
+      const patternsDir = path.join(__dirname, "..", PATTERNS_DIR);
+      return listSubfolders(patternsDir);
+
+    }
 
     if (options.pattern) {
 

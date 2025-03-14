@@ -120,8 +120,8 @@ Options:
 
 - [x] `-p, --pattern              Choose a pattern from the available patterns`
 - [x] `-t, --temperature=         Set temperature (default: 0.7)`
+- [x] `-l, --listpatterns         List all patterns`
 - [ ] `-s, --stream               Stream`
-- [ ] `-l, --listpatterns         List all patterns`
 - [ ] `-L, --listmodels           List all available models`
 - [ ] `-o, --output=              Output to file`
 - [ ] `-c, --copy                 Copy to clipboard`
