@@ -96,7 +96,7 @@ export default class CLI {
         return console.log("Please provide some content.");
       }
 
-      const filePath = path.join(PATTERNS_DIR, pattern, "system.md");
+      const filePath = path.join(__dirname, "..", PATTERNS_DIR, pattern, "system.md");
 
       fs.access(filePath)
         .then(() => fs.readFile(filePath, "utf8"))
