@@ -34,6 +34,14 @@ Check out the [Introducing Fabric — A Human AI Augmentation Framework](https:/
 
   More to come...
 
+## DIFFERENCE FROM `fabric`
+
+  Fabric uses the following option:
+
+  `-v, --variable=` for Values for pattern variables, e.g. `-v=#role:expert -v=#points:30"`
+
+  Atlas uses `-v, --version` for displaying the software version.
+
 ## EXAMPLES:
 
 Examples using [Llama 3.1](https://ai.meta.com/blog/meta-llama-3-1/) model:

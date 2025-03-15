@@ -8,6 +8,7 @@ import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { listSubfolders } from "../common/utils.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
+import { VERSION } from "../main.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -91,6 +92,9 @@ export default class CLI {
 
     }
 
+    if (options.version){
+      return console.log(VERSION);
+    }
     // WiP
     // if (options.chat){
     //   return console.log("Chatting...");
