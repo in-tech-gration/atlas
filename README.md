@@ -130,6 +130,7 @@ A technical standards organization responsible for maintaining and developing th
 
 ## TODO
 
+- [x] Add changelog
 - [ ] Publish on NPM
 - [ ] Port to TypeScript
 - [ ] Write Unit Tests
