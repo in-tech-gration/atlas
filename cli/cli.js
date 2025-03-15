@@ -3,8 +3,6 @@ import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import { Command } from "commander";
 import { ChatOllama } from "@langchain/ollama";
-import { StringOutputParser } from "@langchain/core/output_parsers";
-import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { listSubfolders } from "../common/utils.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"

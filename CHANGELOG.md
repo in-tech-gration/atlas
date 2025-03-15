@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `-v, --version` option to display software version
 - Add `CHANGELOG.md`
+- Add `ESLint` for the development of the app
 
 ## [0.1.0] - 14/03/2025
 
