@@ -23,6 +23,7 @@ Check out the [Introducing Fabric — A Human AI Augmentation Framework](https:/
 
   **Prerequisites:**
 
+  - Install [Node.js](https://nodejs.org/en/download)
   - Install [Ollama](https://ollama.com/)
   - Run `Ollama` and install `llama3.1:latest` model
 

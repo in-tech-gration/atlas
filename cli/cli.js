@@ -27,6 +27,7 @@ export default class CLI {
     program
       .name("atlas")
       .description("atlas-fabric is an open-source framework for augmenting humans using AI.")
+      .option("-v, --version", "Display version") // Overrides fabric option
       // .option("--calendar", "Experimental calendar feature") // WiP
       // .option('--chat', 'Start a chat session') // WiP
       .option('-p, --pattern <pattern...>', 'Choose a pattern from the available patterns')
@@ -38,6 +39,7 @@ export default class CLI {
       // -L, --listmodels           List all available models
       // -o, --output=              Output to file
       // -c, --copy                 Copy to clipboard
+      // Ref: https://github.com/danielmiessler/fabric/?tab=readme-ov-file#usage
       .version(this.VERSION)
 
     let stdin = "";
