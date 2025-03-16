@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `CHANGELOG.md`
 - Add `ESLint` for the development of the app
 - Add `chalk` module for colorful output
+- Add `prompts` module
 
 ### Fixed
 
