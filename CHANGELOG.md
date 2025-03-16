@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `ESLint` for the development of the app
 - Add `chalk` module for colorful output
 - Add `prompts` module
+- Add `getOllamaModels` method to get all available local Ollama models 
+- Add `configstore` module for storing and retrieving configuration options
+- Add `--setup` option to select Ollama model
 
 ### Fixed
 
@@ -22,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Read version from `package.json` instead of hardcoded value
+- Modify `listPatterns` to get all patterns
 
 ### Removed
 

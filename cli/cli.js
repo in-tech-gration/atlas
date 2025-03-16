@@ -1,22 +1,27 @@
 import fs from "node:fs/promises";
-import path, { dirname } from "path";
-import { fileURLToPath } from "url";
+import path, { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import os from "node:os";;
 import { Command } from "commander";
 import { ChatOllama } from "@langchain/ollama";
-import { listSubfolders } from "../common/utils.js";
+import { listPatterns, getOllamaModels } from "../common/utils.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import chalk from 'chalk';
+import prompts from "prompts";
+import { PATTERNS_DIR } from "../common/config.js";
+
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const PATTERNS_DIR = "patterns";
-
 export default class CLI {
 
-  constructor({ version }) {
+  constructor({ version, config }) {
     this.version = version;
+    this.config = config;
     this.model = null;
+    this.platform = os.platform(); // 'win32', 'darwin', 'linux', etc.
+    this.arch = os.arch(); // 'x64', 'arm', 'arm64'
   }
 
   init() {
@@ -32,6 +37,7 @@ export default class CLI {
       .option('-p, --pattern <pattern...>', 'Choose a pattern from the available patterns')
       .option('-t, --temperature [temperature]', 'Set temperature (default: 0.7)')
       .option('-m, --model [model]', 'Choose model')
+      .option('-S, --setup', 'Run setup for all reconfigurable parts of atlas')
       .option('-l, --listpatterns', 'List all patterns')
       // TODO:
       // -s, --stream               Stream
@@ -71,7 +77,7 @@ export default class CLI {
 
   initLLM(options) {
 
-    const defaults = { model: "llama3.1:latest", temperature: 0.7 }
+    const defaults = { temperature: 0.7 }
     const { model, temperature } = Object.assign(defaults, options);
 
     const chatModel = new ChatOllama({
@@ -85,17 +91,60 @@ export default class CLI {
 
   }
 
-  execute({ options, program, stdin }) {
+  async execute({ options, program, stdin }) {
 
     if (options.listpatterns) {
 
-      const patternsDir = path.join(__dirname, "..", PATTERNS_DIR);
-      return listSubfolders(patternsDir);
+      return listPatterns();
 
     }
 
     if (options.version) {
       return console.log(this.version);
+    }
+
+    if (options.setup) {
+
+      const ollamaModels = await getOllamaModels()
+
+      const questions = [
+        {
+          type: 'toggle',
+          name: 'ollama_installed',
+          message: 'Do you have Ollama installed?',
+          initial: true,
+          active: 'yes',
+          inactive: 'no'
+        },
+        {
+          type: prev => prev == true ? 'select' : null,
+          name: 'ollama_model',
+          message: 'Pick an Ollama model:',
+          choices: ollamaModels.map(model => {
+            return {
+              title: model,
+              value: model
+            }
+          }),
+          initial: 1
+        }
+      ];
+
+      const response = await prompts(questions);
+
+      if ( !response.ollama_installed ){
+        return console.log("Please install Ollama and run the setup again");
+      }
+      if ( !response.ollama_model ){
+        return console.log("You must pick an Ollama model in order to use the LLM capabilities of atlas");
+      }
+
+      this.config.set('ollama_enabled', true);
+      this.config.set('ollama_model', response.ollama_model);
+      console.log("You've selected:", response.ollama_model);
+      return;
+
+
     }
 
     // WiP
@@ -118,13 +167,22 @@ export default class CLI {
         return console.log("Please provide some content.");
       }
 
+      const ollamaEnabled = this.config.get('ollama_enabled');
+      const ollamaModel = this.config.get('ollama_model');
+
+      if ( !ollamaEnabled || !ollamaModel ){
+        return console.log(chalk.redBright("You must select a language model in order to use the AI capabilities of atlas"));
+      }
+
       const filePath = path.join(__dirname, "..", PATTERNS_DIR, pattern, "system.md");
 
       return fs.access(filePath)
         .then(() => fs.readFile(filePath, "utf8"))
         .then(async (content) => {
 
-          const llmOptions = {}
+          const llmOptions = {
+            model: ollamaModel
+          }
 
           if ("temperature" in options) {
             llmOptions.temperature = parseFloat(options.temperature);
