@@ -132,6 +132,7 @@ A technical standards organization responsible for maintaining and developing th
 ## TODO
 
 - [x] Add changelog
+- [x] Add `chalk` module for colorful outputs
 - [ ] Publish on NPM
 - [ ] Port to TypeScript
 - [ ] Write Unit Tests

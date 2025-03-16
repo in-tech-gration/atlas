@@ -16,6 +16,7 @@ export default class CLI {
 
   constructor({ version }) {
     this.version = version;
+    this.model = null;
   }
 
   init() {
@@ -79,6 +80,7 @@ export default class CLI {
       temperature
     });
 
+    this.model = model;
     this.chatModel = chatModel;
 
   }
