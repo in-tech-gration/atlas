@@ -133,6 +133,7 @@ A technical standards organization responsible for maintaining and developing th
 
 - [x] Add changelog
 - [x] Add `chalk` module for colorful outputs
+- [x] Read version from `package.json`
 - [ ] Publish on NPM
 - [ ] Port to TypeScript
 - [ ] Write Unit Tests

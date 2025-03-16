@@ -5,8 +5,8 @@ import { Command } from "commander";
 import { ChatOllama } from "@langchain/ollama";
 import { listSubfolders } from "../common/utils.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import chalk from 'chalk';
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
-import { VERSION } from "../main.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -95,7 +95,7 @@ export default class CLI {
     }
 
     if (options.version){
-      return console.log(VERSION);
+      return console.log(this.version);
     }
     // WiP
     // if (options.chat){
