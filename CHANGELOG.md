@@ -13,7 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `CHANGELOG.md`
 - Add `ESLint` for the development of the app
 - Add `chalk` module for colorful output
-- Read version from `package.json`
+
+### Fixed
+
+- Fix uncaught error when `Ollama` is not running
+
+### Changed
+
+- Read version from `package.json` instead of hardcoded value
+
+### Removed
 
 ## [0.1.0] - 14/03/2025
 

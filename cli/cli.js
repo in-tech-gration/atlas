@@ -94,9 +94,10 @@ export default class CLI {
 
     }
 
-    if (options.version){
+    if (options.version) {
       return console.log(this.version);
     }
+
     // WiP
     // if (options.chat){
     //   return console.log("Chatting...");
@@ -119,7 +120,7 @@ export default class CLI {
 
       const filePath = path.join(__dirname, "..", PATTERNS_DIR, pattern, "system.md");
 
-      fs.access(filePath)
+      return fs.access(filePath)
         .then(() => fs.readFile(filePath, "utf8"))
         .then(async (content) => {
 
@@ -131,12 +132,30 @@ export default class CLI {
 
           this.initLLM(llmOptions);
 
-          const response = await this.chatModel.invoke([
-            new SystemMessage(content),
-            new HumanMessage(stdin ? stdin : data)
-          ]);
+          try {
 
-          console.log(response.content);
+            const response = await this.chatModel.invoke([
+              new SystemMessage(content),
+              new HumanMessage(stdin ? stdin : data)
+            ]);
+
+            console.log(response.content);
+
+          } catch (error) {
+
+            // Handle case where Ollama might not be running locally:
+            const isChatOllama = this.chatModel instanceof ChatOllama;
+            if (error.message === "fetch failed" && isChatOllama) {
+
+              console.log(chalk.redBright("[ ERROR:LLM:INIT ]"), `Error trying to initialize ${chalk.bold(this.model)} model. \nPlease make sure that Ollama is running ${chalk.italic(`('ollama run ${this.model}')`)} and that the model is available.`);
+
+              console.log(chalk.green("Troubleshooting:"), `Have you ran ${chalk.bold(`ollama pull ${this.model}`)} to download the model?`);
+
+              console.log(chalk.redBright("(debug:info:initLLM)"));
+
+            }
+
+          }
 
           // [ DEPRECATED ] In favour of simpler invocation with plain text input (see above)
           // const prompt = ChatPromptTemplate.fromMessages([
@@ -152,11 +171,9 @@ export default class CLI {
           console.log("File does not exist.", error);
         });
 
-    } else {
-
-      program.help();
-
     }
+
+    program.help();
 
   }
 
