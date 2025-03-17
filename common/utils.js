@@ -1,9 +1,10 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path, { dirname } from "node:path";
+import chalk from 'chalk';
 import { PATTERNS_DIR } from "./config.js";
 import { fileURLToPath } from "url";
-import { execSync } from 'child_process';
+// import { execSync } from 'child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -109,12 +110,17 @@ function getAvailableOllamaModels() {
 
 // Alternative solutions to updating the app:
 // npm update -g atlas-fabric
-// npm install -g atlas-fabric@latest
-function selfUpdate() {
-  try {
-    execSync('npm install -g atlas-fabric@latest', { stdio: 'inherit' });
-    console.log('Update complete!');
-  } catch (error) {
-    console.error('Update failed:', error);
-  }
+export function selfUpdate() {
+
+  console.log(
+    `To update atlas, please run: ${chalk.green.bold("npm install -g atlas-fabric@latest")}`
+  );
+
+  // try {
+  //   execSync('npm install -g atlas-fabric@latest', { stdio: 'inherit' });
+  //   console.log('Update complete!');
+  // } catch (error) {
+  //   console.error('Update failed:', error);
+  // }
+
 }

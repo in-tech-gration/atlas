@@ -4,7 +4,12 @@ import { fileURLToPath } from "node:url";
 import os from "node:os";;
 import { Command } from "commander";
 import { ChatOllama } from "@langchain/ollama";
-import { listPatterns, getOllamaModels, OllamaError } from "../common/utils.js";
+import { 
+  getOllamaModels, 
+  listPatterns, 
+  OllamaError,
+  selfUpdate, 
+} from "../common/utils.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import chalk from 'chalk';
 import prompts from "prompts";
@@ -106,6 +111,11 @@ export default class CLI {
 
     if (options.setup) {
 
+      if ( Object.keys(this.config.all).length > 0 ){
+        console.log(chalk.gray("Current configuration:"));
+        console.log(chalk.gray(JSON.stringify(this.config.all)));
+      }
+
       let ollamaModels;
 
       try {
@@ -164,7 +174,7 @@ export default class CLI {
     }
 
     if (options.update) {
-      return console.log(`To update atlas, please run: ${chalk.green.bold("npm update -g atlas-fabric")}`);
+      return selfUpdate();
     }
 
     // WiP
