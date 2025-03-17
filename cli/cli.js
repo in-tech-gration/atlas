@@ -167,6 +167,14 @@ export default class CLI {
         return console.log("Please provide some content.");
       }
 
+      const patternFilePath = path.join(__dirname, "..", PATTERNS_DIR, pattern, "system.md");
+
+      try {
+        await fs.access(patternFilePath);
+      } catch {
+        return console.log(`Error initializing pattern: ${pattern}. Please check any misspellings.`);
+      }
+
       const ollamaEnabled = this.config.get('ollama_enabled');
       const ollamaModel = this.config.get('ollama_model');
 
@@ -174,10 +182,7 @@ export default class CLI {
         return console.log(chalk.redBright("You must select a language model in order to use the AI capabilities of atlas"));
       }
 
-      const filePath = path.join(__dirname, "..", PATTERNS_DIR, pattern, "system.md");
-
-      return fs.access(filePath)
-        .then(() => fs.readFile(filePath, "utf8"))
+      return fs.readFile(patternFilePath, "utf8")
         .then(async (content) => {
 
           const llmOptions = {

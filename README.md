@@ -137,7 +137,7 @@ A technical standards organization responsible for maintaining and developing th
 - [ ] Publish on NPM
 - [ ] Port to TypeScript
 - [ ] Write Unit Tests
-- [ ] Enable ESLint
+- [x] Enable ESLint
 - [ ] Introduce Agentic workflows based on LangGraph
 - [ ] Integrate LLM APIs
 - [ ] Add Chat mode
