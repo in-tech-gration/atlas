@@ -25,6 +25,16 @@ export async function listPatterns() {
   }
 }
 
+export class OllamaError extends Error {
+
+  constructor({ message, code }) {
+    super(message);
+    this.name = 'OllamaError';
+    this.code = code;
+  }
+
+}
+
 export async function getOllamaModels() {
 
   const homedir = os.homedir();
@@ -74,11 +84,24 @@ export async function getOllamaModels() {
     return models;
   }
 
+  try {
+
+    await fs.readdir(ollamaModelsManifestsDir);
+
+  } catch {
+
+    throw new OllamaError({
+      code: "OLLAMA_DIR_MISSING",
+      message: "Ollama registry could not be found."
+    });
+
+  }
+
   return listAllSubfolders(ollamaModelsManifestsDir);
 
 }
 
-function getAvailableOllamaModels(){
+function getAvailableOllamaModels() {
 
   const URL = "https://ollama-models.zwz.workers.dev/";
 

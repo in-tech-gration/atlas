@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import os from "node:os";;
 import { Command } from "commander";
 import { ChatOllama } from "@langchain/ollama";
-import { listPatterns, getOllamaModels } from "../common/utils.js";
+import { listPatterns, getOllamaModels, OllamaError } from "../common/utils.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import chalk from 'chalk';
 import prompts from "prompts";
@@ -105,7 +105,22 @@ export default class CLI {
 
     if (options.setup) {
 
-      const ollamaModels = await getOllamaModels()
+      let ollamaModels;
+
+      try {
+
+        ollamaModels = await getOllamaModels();
+        
+      } catch (error) {
+
+        if ( error instanceof OllamaError ){
+          console.log(
+            chalk.red("Error while trying to find Ollama. Is it installed on your system?")
+          );
+          return console.log(chalk.blue(`Check out ${chalk.bold("https://ollama.com/")}`));
+        }
+        
+      }
 
       const questions = [
         {
