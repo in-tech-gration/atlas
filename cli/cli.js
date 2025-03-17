@@ -39,6 +39,7 @@ export default class CLI {
       .option('-m, --model [model]', 'Choose model')
       .option('-S, --setup', 'Run setup for all reconfigurable parts of atlas')
       .option('-l, --listpatterns', 'List all patterns')
+      .option('--update', 'Update app version')
       // TODO:
       // -s, --stream               Stream
       // -L, --listmodels           List all available models
@@ -110,16 +111,16 @@ export default class CLI {
       try {
 
         ollamaModels = await getOllamaModels();
-        
+
       } catch (error) {
 
-        if ( error instanceof OllamaError ){
+        if (error instanceof OllamaError) {
           console.log(
             chalk.red("Error while trying to find Ollama. Is it installed on your system?")
           );
           return console.log(chalk.blue(`Check out ${chalk.bold("https://ollama.com/")}`));
         }
-        
+
       }
 
       const questions = [
@@ -147,10 +148,10 @@ export default class CLI {
 
       const response = await prompts(questions);
 
-      if ( !response.ollama_installed ){
+      if (!response.ollama_installed) {
         return console.log("Please install Ollama and run the setup again");
       }
-      if ( !response.ollama_model ){
+      if (!response.ollama_model) {
         return console.log("You must pick an Ollama model in order to use the LLM capabilities of atlas");
       }
 
@@ -160,6 +161,10 @@ export default class CLI {
       return;
 
 
+    }
+
+    if (options.update) {
+      return console.log(`To update atlas, please run: ${chalk.green.bold("npm update -g atlas-fabric")}`);
     }
 
     // WiP
@@ -193,7 +198,7 @@ export default class CLI {
       const ollamaEnabled = this.config.get('ollama_enabled');
       const ollamaModel = this.config.get('ollama_model');
 
-      if ( !ollamaEnabled || !ollamaModel ){
+      if (!ollamaEnabled || !ollamaModel) {
         return console.log(chalk.redBright("You must select a language model in order to use the AI capabilities of atlas"));
       }
 
