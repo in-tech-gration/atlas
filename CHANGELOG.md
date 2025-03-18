@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Show current configuration when running `--setup`
+- Add support for environmental variables
+- Add support for cloud LLM providers (Groq/TogetherAI)
 
 ## [0.1.3] - 18/03/2025
 
