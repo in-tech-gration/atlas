@@ -15,23 +15,25 @@ Check out the [Introducing Fabric — A Human AI Augmentation Framework](https:/
 
 ## INSTALLATION
 
-  - `git clone git@github.com:in-tech-gration/atlas.git`
-  - `cd atlas`
-  - `npm install`
-  - `npm link`
-  - `atlas --help`
-
   **Prerequisites:**
 
   - Install [Node.js](https://nodejs.org/en/download)
   - Install [Ollama](https://ollama.com/)
-  - Run `Ollama` and install `llama3.1:latest` model
+  - (Optional) Run `Ollama` and install `llama3.1:latest` model to run local offline models
+
+  - `git clone git@github.com:in-tech-gration/atlas.git`
+  - `cd atlas`
+  - `npm install`
+  - `npm link`
+  - `atlas --setup`
 
 ## AVAILABLE OPTIONS
 
   - `-p, --pattern <pattern...>`
   - `-t, --temperature [temperature]`
   - `-l, --listpatterns`
+  - `-m, --model [model]`
+    - Running `-m` or `--model` without any parameters, will display the currently selected model and provider.
 
   More to come...
 

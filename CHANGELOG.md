@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Show current configuration when running `--setup`
 - Add support for environmental variables
 - Add support for cloud LLM providers (Groq/TogetherAI)
+- Add option `-m, --model` to display the model and provider (without any parameters)
 
 ## [0.1.3] - 18/03/2025
 

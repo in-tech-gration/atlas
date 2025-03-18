@@ -308,6 +308,30 @@ export default class CLI {
       return selfUpdate();
     }
 
+    if (options.model && typeof options.model === "boolean"){
+      
+      let llmProviderName; 
+      const llmProvider = this.config.get('llm_provider');
+
+      if ( llmProvider ){
+        llmProviderName = providers.find( provider =>{
+          return provider.value === llmProvider;
+        });
+      }
+
+      const model = this.config.get('model');
+
+      if ( llmProviderName ){
+        console.log(`Selected provider: ${chalk.green(llmProviderName.title)}`);
+      }
+
+      if ( model ){
+        console.log(`Selected model: ${chalk.green(model)}`);
+      }
+
+      return;
+    }
+
     // WiP
     // if (options.chat){
     //   return console.log("Chatting...");
