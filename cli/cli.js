@@ -4,16 +4,23 @@ import { fileURLToPath } from "node:url";
 import os from "node:os";;
 import { Command } from "commander";
 import { ChatOllama } from "@langchain/ollama";
-import { 
-  getOllamaModels, 
-  listPatterns, 
+import { TogetherAI } from "@langchain/community/llms/togetherai";
+import { ChatGroq } from "@langchain/groq";
+import {
+  getOllamaModels,
+  listPatterns,
   OllamaError,
-  selfUpdate, 
+  selfUpdate,
 } from "../common/utils.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import chalk from 'chalk';
 import prompts from "prompts";
-import { PATTERNS_DIR } from "../common/config.js";
+import {
+  getAPIKey,
+  PATTERNS_DIR,
+  saveAPIKey,
+} from "../common/config.js";
+import { providers, models } from "../common/providers.js";
 
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
@@ -84,16 +91,63 @@ export default class CLI {
   initLLM(options) {
 
     const defaults = { temperature: 0.7 }
-    const { model, temperature } = Object.assign(defaults, options);
+    const { model, temperature, provider } = Object.assign(defaults, options);
 
-    const chatModel = new ChatOllama({
-      baseUrl: "http://localhost:11434",
-      model,
-      temperature
-    });
+    if (provider === "provider_together_ai") {
 
-    this.model = model;
-    this.chatModel = chatModel;
+      const chatModel = new TogetherAI({
+        model,
+        maxTokens: 256,
+        temperature,
+      });
+
+      this.model = model;
+      this.chatModel = chatModel;
+      return { isSupported: true }
+
+    }
+
+    if (provider === "provider_groq") {
+
+      try {
+        
+        const chatModel = new ChatGroq({
+          model,
+          temperature,
+          // maxTokens: undefined,
+          // maxRetries: 2,
+          // other params...
+          // apiKey: 
+        });
+  
+        this.model = model;
+        this.chatModel = chatModel;
+        
+        return { isSupported: true }
+        
+      } catch (error) {
+        
+        return { isSupported: true, errorMessage: error.message }
+        
+      }
+
+    }
+
+    if (provider === "provider_ollama") {
+
+      const chatModel = new ChatOllama({
+        baseUrl: "http://localhost:11434",
+        model,
+        temperature
+      });
+
+      this.model = model;
+      this.chatModel = chatModel;
+      return { isSupported: true };
+
+    }
+
+    return { isSupported: false };
 
   }
 
@@ -111,9 +165,9 @@ export default class CLI {
 
     if (options.setup) {
 
-      if ( Object.keys(this.config.all).length > 0 ){
-        console.log(chalk.gray("Current configuration:"));
-        console.log(chalk.gray(JSON.stringify(this.config.all)));
+      if (Object.keys(this.config.all).length > 0) {
+        // console.log(chalk.gray("Current configuration:"));
+        // console.log(chalk.gray(JSON.stringify(this.config.all)));
       }
 
       let ollamaModels;
@@ -133,41 +187,118 @@ export default class CLI {
 
       }
 
+      models.provider_ollama = ollamaModels;
+
+      const currentLlmProvider = this.config.get("llm_provider");
+      const currentModel = this.config.get("model");
+
+      const TAVILY_API_KEY = getAPIKey("TAVILY_API_KEY");
+      const TOGETHER_AI_API_KEY = getAPIKey("TOGETHER_AI_API_KEY");
+      const GROQ_API_KEY = getAPIKey("GROQ_API_KEY");
+
+      // https://github.com/terkelg/prompts?tab=readme-ov-file#-types
       const questions = [
         {
-          type: 'toggle',
-          name: 'ollama_installed',
+          type: 'select',
+          name: 'llm_provider',
+          message: 'Pick your LLM provider',
+          choices: providers,
+          initial: () => {
+            if (!currentLlmProvider) {
+              return 0;
+            }
+            return providers.findIndex(provider => {
+              return provider.value === currentLlmProvider;
+            })
+          },
+        },
+        {
+          type: (prev, all) => {
+            if (prev === "provider_ollama") {
+              return 'toggle';
+            }
+            return null;
+          },
+          name: 'ollama_enabled',
           message: 'Do you have Ollama installed?',
-          initial: true,
+          initial: !!this.config.get("ollama_enabled"),
           active: 'yes',
           inactive: 'no'
         },
         {
-          type: prev => prev == true ? 'select' : null,
-          name: 'ollama_model',
-          message: 'Pick an Ollama model:',
-          choices: ollamaModels.map(model => {
-            return {
-              title: model,
-              value: model
+          type: 'select',
+          name: 'model',
+          message: (prev, all) => {
+            const selectedProviderTitle = providers.find(provider => {
+              return provider.value === all.llm_provider;
+            })
+            return `Pick a model from selected provider (${selectedProviderTitle.title}):`;
+          },
+          choices: (prev, all) => {
+            return models[all.llm_provider].map(model => {
+              return {
+                title: model,
+                value: model,
+              }
+            });
+          },
+          initial: (prev, all) => {
+            if (currentLlmProvider === all.llm_provider) {
+              return models[currentLlmProvider].findIndex(model => {
+                return model === currentModel;
+              })
             }
-          }),
-          initial: 1
-        }
+            return 0;
+          }
+        },
+        {
+          type: 'text',
+          name: 'tavily_api_key',
+          message: `[optional] Enter your TAVILY API KEY (used in patterns that require Web search)`,
+          initial: TAVILY_API_KEY
+        },
+        {
+          type: 'text',
+          name: 'together_ai_api_key',
+          message: `[optional] Enter your Together.AI API KEY (used for cloud access to LLMs)`,
+          initial: TOGETHER_AI_API_KEY
+        },
+        {
+          type: 'text',
+          name: 'groq_api_key',
+          message: `[optional] Enter your Groq API KEY (used for cloud access to LLMs)`,
+          initial: GROQ_API_KEY
+        },
       ];
 
       const response = await prompts(questions);
 
-      if (!response.ollama_installed) {
-        return console.log("Please install Ollama and run the setup again");
+      if (response.tavily_api_key) {
+        saveAPIKey("TAVILY_API_KEY", response.tavily_api_key);
       }
-      if (!response.ollama_model) {
-        return console.log("You must pick an Ollama model in order to use the LLM capabilities of atlas");
+      if (response.together_ai_api_key) {
+        saveAPIKey("TOGETHER_AI_API_KEY", response.together_ai_api_key);
+      }
+      if (response.groq_api_key) {
+        saveAPIKey("GROQ_API_KEY", response.groq_api_key);
       }
 
-      this.config.set('ollama_enabled', true);
-      this.config.set('ollama_model', response.ollama_model);
-      console.log("You've selected:", response.ollama_model);
+      if (!response.llm_provider) {
+        return console.log("You must select an LLM provider");
+      }
+
+      if (!response.model) {
+        return console.log("You must pick a model in order to use the LLM capabilities of atlas");
+      }
+
+      if (response.ollama_enabled) {
+        this.config.set('ollama_enabled', true);
+      }
+
+      this.config.set('llm_provider', response.llm_provider);
+      this.config.set('model', response.model);
+      console.log("You've selected:", response.model);
+
       return;
 
 
@@ -205,10 +336,10 @@ export default class CLI {
         return console.log(`Error initializing pattern: ${pattern}. Please check any misspellings.`);
       }
 
-      const ollamaEnabled = this.config.get('ollama_enabled');
-      const ollamaModel = this.config.get('ollama_model');
+      const llmProvider = this.config.get('llm_provider');
+      const model = this.config.get('model');
 
-      if (!ollamaEnabled || !ollamaModel) {
+      if (!llmProvider || !model) {
         return console.log(chalk.redBright("You must select a language model in order to use the AI capabilities of atlas"));
       }
 
@@ -216,14 +347,23 @@ export default class CLI {
         .then(async (content) => {
 
           const llmOptions = {
-            model: ollamaModel
+            provider: llmProvider,
+            model
           }
 
           if ("temperature" in options) {
             llmOptions.temperature = parseFloat(options.temperature);
           }
 
-          this.initLLM(llmOptions);
+          const { isSupported, errorMessage } = this.initLLM(llmOptions);
+
+          if (!isSupported) {
+            return console.log(`LLM Provider currently not supported. Please run ${chalk.bold("atlas -S")} and select supported provider.`);
+          }
+
+          if (errorMessage){
+            return console.log(chalk.red(errorMessage));
+          }
 
           try {
 
@@ -232,7 +372,15 @@ export default class CLI {
               new HumanMessage(stdin ? stdin : data)
             ]);
 
-            console.log(response.content);
+            if (llmProvider === "provider_ollama" || llmProvider === "provider_groq") {
+
+              console.log(response.content);
+
+            } else {
+
+              console.log(response);
+
+            }
 
           } catch (error) {
 
