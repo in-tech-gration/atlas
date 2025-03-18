@@ -37,6 +37,7 @@ export const models = {
   provider_groq: [
     "deepseek-r1-distill-llama-70b",
     "llama3-70b-8192",
+    "gemma2-9b-it",
   ],
 
 }
