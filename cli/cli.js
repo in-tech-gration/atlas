@@ -6,6 +6,7 @@ import { Command } from "commander";
 import { ChatOllama } from "@langchain/ollama";
 import { TogetherAI } from "@langchain/community/llms/togetherai";
 import { ChatGroq } from "@langchain/groq";
+import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
 import {
   getOllamaModels,
   listPatterns,
@@ -49,11 +50,12 @@ export default class CLI {
       // .option('--chat', 'Start a chat session') // WiP
       .option('-p, --pattern <pattern...>', 'Choose a pattern from the available patterns')
       .option('-t, --temperature [temperature]', 'Set temperature (default: 0.7)')
-      .option('-m, --model [model]', 'Choose model')
+      .option('-m, --model [model]', 'Choose model (or show currently selected model [without parameters')
       .option('-S, --setup', 'Run setup for all reconfigurable parts of atlas')
       .option('-l, --listpatterns', 'List all patterns')
       .option('--update', 'Update app version')
       .option('-c, --copy', 'Copy to clipboard')
+      .option('-w, --web [search]', 'Search the web (using Tavily)')
       // TODO:
       // -s, --stream               Stream
       // -L, --listmodels           List all available models
@@ -196,6 +198,7 @@ export default class CLI {
       const TAVILY_API_KEY = getAPIKey("TAVILY_API_KEY");
       const TOGETHER_AI_API_KEY = getAPIKey("TOGETHER_AI_API_KEY");
       const GROQ_API_KEY = getAPIKey("GROQ_API_KEY");
+      const JINA_API_KEY = getAPIKey("JINA_API_KEY");
 
       // https://github.com/terkelg/prompts?tab=readme-ov-file#-types
       const questions = [
@@ -270,6 +273,12 @@ export default class CLI {
           message: `[optional] Enter your Groq API KEY (used for cloud access to LLMs)`,
           initial: GROQ_API_KEY
         },
+        {
+          type: 'text',
+          name: 'jina_api_key',
+          message: `[optional] Enter your Jina.AI API KEY`,
+          initial: JINA_API_KEY
+        },
       ];
 
       const response = await prompts(questions);
@@ -282,6 +291,9 @@ export default class CLI {
       }
       if (response.groq_api_key) {
         saveAPIKey("GROQ_API_KEY", response.groq_api_key);
+      }
+      if (response.jina_api_key) {
+        saveAPIKey("JINA_API_KEY", response.jina_api_key);
       }
 
       if (!response.llm_provider) {
@@ -329,6 +341,53 @@ export default class CLI {
       if ( model ){
         console.log(`Selected model: ${chalk.green(model)}`);
       }
+
+      return;
+    }
+
+    if (options.web){
+
+      if ( typeof options.web === "boolean" ){
+        return console.log("Missing search context. Please provide some text to search the web.")
+      }
+
+      let tavilyTool;
+
+      try {
+        
+        tavilyTool = new TavilySearchResults({
+          maxResults: 3,
+        });
+
+      } catch (error) {
+
+        console.log(chalk.redBright("Error:", error.message));
+
+        if ( error.message.includes("No Tavily API key found") ){
+          console.log(`Run ${chalk.blue("atlas -S")} to set up your API keys.`);
+        }
+
+        return;
+
+      }
+
+      const searchResults = await tavilyTool.invoke({
+        input: options.web,
+      });
+
+      const searchResultsJSON = JSON.parse(searchResults);
+
+      let output = `Here are some search results while searching the web for "${options.web}":`
+
+      searchResultsJSON.forEach((result, index) =>{
+        output += `\n\n`;
+        output += `## Search result #${index}:\n\n`;
+        output += `Title: ${result.title}\n`;
+        output += `URL: ${result.url}\n`;
+        output += `Content: ${result.content}`;
+      });
+
+      console.log(output);
 
       return;
     }
@@ -423,6 +482,10 @@ export default class CLI {
               console.log(chalk.green("Troubleshooting:"), `Have you ran ${chalk.bold(`ollama pull ${this.model}`)} to download the model?`);
 
               console.log(chalk.redBright("(debug:info:initLLM)"));
+
+            } else {
+
+              console.log(chalk.redBright("ERROR:", error));
 
             }
 
