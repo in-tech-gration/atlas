@@ -21,6 +21,7 @@ import {
   saveAPIKey,
 } from "../common/config.js";
 import { providers, models } from "../common/providers.js";
+import clipboardy from 'clipboardy';
 
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
@@ -52,11 +53,11 @@ export default class CLI {
       .option('-S, --setup', 'Run setup for all reconfigurable parts of atlas')
       .option('-l, --listpatterns', 'List all patterns')
       .option('--update', 'Update app version')
+      .option('-c, --copy', 'Copy to clipboard')
       // TODO:
       // -s, --stream               Stream
       // -L, --listmodels           List all available models
       // -o, --output=              Output to file
-      // -c, --copy                 Copy to clipboard
       // Ref: https://github.com/danielmiessler/fabric/?tab=readme-ov-file#usage
       .version(this.VERSION)
 
@@ -396,14 +397,19 @@ export default class CLI {
               new HumanMessage(stdin ? stdin : data)
             ]);
 
+            let output;
+
             if (llmProvider === "provider_ollama" || llmProvider === "provider_groq") {
-
-              console.log(response.content);
-
+              output = response.content;
             } else {
+              output = response;
+            }
 
-              console.log(response);
+            console.log(output);
 
+            if ( options.copy ){
+              clipboardy.writeSync(output);
+              console.log(chalk.gray("[Response copied to clipboard]"));
             }
 
           } catch (error) {
