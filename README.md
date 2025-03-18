@@ -134,14 +134,14 @@ A technical standards organization responsible for maintaining and developing th
 - [x] Add changelog
 - [x] Add `chalk` module for colorful outputs
 - [x] Read version from `package.json`
-- [ ] Publish on NPM
-- [ ] Port to TypeScript
-- [ ] Write Unit Tests
+- [x] Publish on NPM (`npm i -g atlas-fabric`)
 - [x] Enable ESLint
+- [x] Integrate LLM APIs
+- [x] Implement update functionality
+- [ ] Port to TypeScript
 - [ ] Introduce Agentic workflows based on LangGraph
-- [ ] Integrate LLM APIs
+- [ ] Write Unit Tests
 - [ ] Add Chat mode
-- [ ] Implement update functionality
 
 Options:
 
