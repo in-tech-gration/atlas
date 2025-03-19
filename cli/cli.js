@@ -227,7 +227,18 @@ export default class CLI {
           type: 'select',
           name: 'llm_provider',
           message: 'Pick your LLM provider',
-          choices: providers,
+          choices: (prev, all)=>{
+            if ( !ollamaModels ){
+              return providers.map( provider => {
+                if ( provider.value === "provider_ollama" ){
+                  provider.title = "Ollama [Not installed]";
+                  provider.disabled = true;
+                }
+                return provider;
+              });
+            }
+            return providers;
+          },
           initial: () => {
             if (!currentLlmProvider) {
               return 0;
