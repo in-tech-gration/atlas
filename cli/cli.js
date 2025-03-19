@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import os from "node:os";;
 import { Command } from "commander";
 import { ChatOllama } from "@langchain/ollama";
+import { ChatOpenAI } from "@langchain/openai";
+import { ChatAnthropic } from "@langchain/anthropic";
 import { TogetherAI } from "@langchain/community/llms/togetherai";
 import { ChatGroq } from "@langchain/groq";
 import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
@@ -95,18 +97,19 @@ export default class CLI {
 
     const defaults = { temperature: 0.7 }
     const { model, temperature, provider } = Object.assign(defaults, options);
+    let isSupported = false;
+    this.model = model;
+    let chatModel;
 
     if (provider === "provider_together_ai") {
 
-      const chatModel = new TogetherAI({
+      chatModel = new TogetherAI({
         model,
         maxTokens: 256,
         temperature,
       });
 
-      this.model = model;
-      this.chatModel = chatModel;
-      return { isSupported: true }
+      isSupported = true;
 
     }
 
@@ -114,7 +117,7 @@ export default class CLI {
 
       try {
         
-        const chatModel = new ChatGroq({
+        chatModel = new ChatGroq({
           model,
           temperature,
           // maxTokens: undefined,
@@ -123,10 +126,7 @@ export default class CLI {
           // apiKey: 
         });
   
-        this.model = model;
-        this.chatModel = chatModel;
-        
-        return { isSupported: true }
+        isSupported = true;
         
       } catch (error) {
         
@@ -138,19 +138,38 @@ export default class CLI {
 
     if (provider === "provider_ollama") {
 
-      const chatModel = new ChatOllama({
+      chatModel = new ChatOllama({
         baseUrl: "http://localhost:11434",
         model,
         temperature
       });
+      isSupported = true;
+    
+    }
 
-      this.model = model;
-      this.chatModel = chatModel;
-      return { isSupported: true };
+    if (provider === "provider_open_ai"){
+
+      chatModel = new ChatOpenAI({
+        model,
+        temperature,
+      });
+      isSupported = true;
 
     }
 
-    return { isSupported: false };
+    if (provider === "provider_anthropic"){
+
+      chatModel = new ChatAnthropic({
+        model,
+        temperature,
+      });
+      isSupported = true;
+
+    }
+
+    this.chatModel = chatModel;
+
+    return { isSupported };
 
   }
 
@@ -199,6 +218,8 @@ export default class CLI {
       const TOGETHER_AI_API_KEY = getAPIKey("TOGETHER_AI_API_KEY");
       const GROQ_API_KEY = getAPIKey("GROQ_API_KEY");
       const JINA_API_KEY = getAPIKey("JINA_API_KEY");
+      const OPENAI_API_KEY = getAPIKey("OPENAI_API_KEY");
+      const ANTHROPIC_API_KEY = getAPIKey("ANTHROPIC_API_KEY");
 
       // https://github.com/terkelg/prompts?tab=readme-ov-file#-types
       const questions = [
@@ -257,6 +278,12 @@ export default class CLI {
         },
         {
           type: 'text',
+          name: 'openai_api_key',
+          message: `[optional] Enter your OpenAI API KEY`,
+          initial: OPENAI_API_KEY
+        },
+        {
+          type: 'text',
           name: 'tavily_api_key',
           message: `[optional] Enter your TAVILY API KEY (used in patterns that require Web search)`,
           initial: TAVILY_API_KEY
@@ -275,6 +302,12 @@ export default class CLI {
         },
         {
           type: 'text',
+          name: 'anthropic_api_key',
+          message: `[optional] Enter your Anthropic API KEY`,
+          initial: ANTHROPIC_API_KEY
+        },
+        {
+          type: 'text',
           name: 'jina_api_key',
           message: `[optional] Enter your Jina.AI API KEY`,
           initial: JINA_API_KEY
@@ -283,6 +316,9 @@ export default class CLI {
 
       const response = await prompts(questions);
 
+      if (response.openai_api_key) {
+        saveAPIKey("OPENAI_API_KEY", response.openai_api_key);
+      }
       if (response.tavily_api_key) {
         saveAPIKey("TAVILY_API_KEY", response.tavily_api_key);
       }
@@ -294,6 +330,9 @@ export default class CLI {
       }
       if (response.jina_api_key) {
         saveAPIKey("JINA_API_KEY", response.jina_api_key);
+      }
+      if (response.anthropic_api_key) {
+        saveAPIKey("ANTHROPIC_API_KEY", response.anthropic_api_key);
       }
 
       if (!response.llm_provider) {
@@ -451,6 +490,11 @@ export default class CLI {
 
           try {
 
+            // if ( content.match(/^INPUT:/m) ){
+            //   content = content.replace(/^INPUT:/m, stdin ? stdin : data);
+            // }
+            // return console.log({ content });
+
             const response = await this.chatModel.invoke([
               new SystemMessage(content),
               new HumanMessage(stdin ? stdin : data)
@@ -458,7 +502,11 @@ export default class CLI {
 
             let output;
 
-            if (llmProvider === "provider_ollama" || llmProvider === "provider_groq") {
+            if (
+              llmProvider === "provider_ollama" 
+              || llmProvider === "provider_groq" 
+              || llmProvider === "provider_anthropic"
+            ) {
               output = response.content;
             } else {
               output = response;

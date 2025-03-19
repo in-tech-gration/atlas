@@ -9,24 +9,33 @@ export const providers = [
     description: 'https://groq.com',
     value: 'provider_groq'
   },
-  // {
-  //   title: 'Anthropic',
-  //   description: 'https://anthropic.com',
-  //   value: 'provider_anthropic'
-  // },
+  {
+    title: 'Anthropic',
+    description: 'https://anthropic.com',
+    value: 'provider_anthropic'
+  },
   {
     title: 'Together AI',
     description: 'https://together.ai',
     value: 'provider_together_ai'
   },
-  // {
-  //   title: 'OpenAI',
-  //   description: 'https://openai.com',
-  //   value: 'provider_open_ai'
-  // },
+  {
+    title: 'OpenAI',
+    description: 'https://openai.com',
+    value: 'provider_open_ai'
+  },
 ];;
 
 export const models = {
+
+  provider_anthropic:[
+    "claude-3-5-sonnet-20240620"
+  ],
+
+  provider_open_ai: [
+    "gpt-4o",
+    "gpt-3.5-turbo"
+  ],
 
   provider_together_ai: [
     "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
