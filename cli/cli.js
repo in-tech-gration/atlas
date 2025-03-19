@@ -204,7 +204,7 @@ export default class CLI {
           console.log(
             chalk.red("Error while trying to find Ollama. Is it installed on your system?")
           );
-          return console.log(chalk.blue(`Check out ${chalk.bold("https://ollama.com/")}`));
+          console.log(chalk.blue(`Check out ${chalk.bold("https://ollama.com/")}`));
         }
 
       }
