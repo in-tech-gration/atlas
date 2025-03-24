@@ -28,6 +28,7 @@ export const providers = [
 
 export const models = {
 
+  // Source: https://docs.anthropic.com/en/docs/about-claude/models/all-models
   provider_anthropic:[
     {
       name: "claude-3-7-sonnet-latest",
