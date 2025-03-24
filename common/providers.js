@@ -29,24 +29,53 @@ export const providers = [
 export const models = {
 
   provider_anthropic:[
-    "claude-3-5-sonnet-20240620"
+    {
+      name: "claude-3-7-sonnet-latest",
+      description: "Our most intelligent model",
+      context_window: 200_000,
+      max_output_tokens: 8192,
+    },
+    {
+      name: "claude-3-5-sonnet-latest",
+      description: "Our previous most intelligent model",
+      context_window: 200_000,
+      max_output_tokens: 8192,
+    },
+    {
+      name: "claude-3-5-haiku-latest",
+      description: "Our fastest model",
+      context_window: 200_000,
+      max_output_tokens: 8192,
+    },
+    {
+      name: "claude-3-opus-latest",
+      description: "Powerful model for complex tasks",
+      context_window: 200_000,
+      max_output_tokens: 4096,
+    },
+    {
+      name: "claude-3-haiku-20240307",
+      description: "Fastest and most compact model for near-instant responsiveness",
+      context_window: 200_000,
+      max_output_tokens: 4096,
+    },
   ],
 
   provider_open_ai: [
-    "gpt-4o",
-    "gpt-3.5-turbo"
+    { name: "gpt-4o" },
+    { name: "gpt-3.5-turbo" },
   ],
 
   provider_together_ai: [
-    "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
-    "meta-llama/Llama-Vision-Free",
-    "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+    { name: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free" },
+    { name: "meta-llama/Llama-Vision-Free" },
+    { name: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free" },
   ],
 
   provider_groq: [
-    "deepseek-r1-distill-llama-70b",
-    "llama3-70b-8192",
-    "gemma2-9b-it",
+    { name: "deepseek-r1-distill-llama-70b" },
+    { name: "llama3-70b-8192" },
+    { name: "gemma2-9b-it" },
   ],
 
 }

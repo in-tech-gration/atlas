@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.54] - 25/03/2025
+
+### Added
+
+- Add 3 more Anthropic models: `claude-3-5-sonnet-latest`, `claude-3-7-sonnet-latest`, `claude-3-5-haiku-latest`, `claude-3-haiku` and `claude-3-opus-latest`
+
+### Changed
+
+- Language Models is now a list that contains objects with `name`, `context_window`, `desciption` and `max_output_tokens` properties.
+
+## [0.1.53] - 20/03/2025
+
+### Added
+
+- Add version number in help screen
+
 ## [0.1.52] - 20/03/2025
 
 ### Fixed

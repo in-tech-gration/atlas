@@ -74,9 +74,13 @@ export async function getOllamaModels() {
         const model = path.basename(secondLevelFolder);
         for (const version of versions) {
           if (folder === "library") {
-            models.push(`${model}:${version}`)
+            models.push({
+              name: `${model}:${version}`
+            })
           } else {
-            models.push(`${folder}/${model}:${version}`);
+            models.push({ 
+              name: `${folder}/${model}:${version}`
+            });
           }
         }
       }

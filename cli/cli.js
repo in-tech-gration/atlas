@@ -63,7 +63,9 @@ export default class CLI {
       // -L, --listmodels           List all available models
       // -o, --output=              Output to file
       // Ref: https://github.com/danielmiessler/fabric/?tab=readme-ov-file#usage
-      .version(this.VERSION)
+      // .version(this.version)
+
+    program.addHelpText('before', chalk.green.bold(`[[ Welcome to atlas v${this.version} ]]`));
 
     let stdin = "";
 
@@ -223,6 +225,7 @@ export default class CLI {
 
       // https://github.com/terkelg/prompts?tab=readme-ov-file#-types
       const questions = [
+        // PROVIDER SELECTION:
         {
           type: 'select',
           name: 'llm_provider',
@@ -248,6 +251,7 @@ export default class CLI {
             })
           },
         },
+        // OLLAMA INSTALLATION CHECK:
         {
           type: (prev, all) => {
             if (prev === "provider_ollama") {
@@ -261,6 +265,7 @@ export default class CLI {
           active: 'yes',
           inactive: 'no'
         },
+        // MODEL SELECTION:
         {
           type: 'select',
           name: 'model',
@@ -272,51 +277,60 @@ export default class CLI {
           },
           choices: (prev, all) => {
             return models[all.llm_provider].map(model => {
+
               return {
-                title: model,
-                value: model,
+                title: model.name,
+                value: model.name,
+                description: model.description ? model.description : undefined,
               }
             });
           },
           initial: (prev, all) => {
+
             if (currentLlmProvider === all.llm_provider) {
               return models[currentLlmProvider].findIndex(model => {
-                return model === currentModel;
+                return model.name === currentModel;
               })
             }
             return 0;
           }
         },
+        // OPENAI API KEY:
         {
           type: 'text',
           name: 'openai_api_key',
           message: `[optional] Enter your OpenAI API KEY`,
           initial: OPENAI_API_KEY
         },
+        // TAVILY API KEY:
         {
           type: 'text',
           name: 'tavily_api_key',
           message: `[optional] Enter your TAVILY API KEY (used in patterns that require Web search)`,
           initial: TAVILY_API_KEY
         },
+        // TOGETHER.AI API KEY:
         {
           type: 'text',
           name: 'together_ai_api_key',
           message: `[optional] Enter your Together.AI API KEY (used for cloud access to LLMs)`,
           initial: TOGETHER_AI_API_KEY
         },
+        // GROQ API KEY:
         {
           type: 'text',
           name: 'groq_api_key',
           message: `[optional] Enter your Groq API KEY (used for cloud access to LLMs)`,
           initial: GROQ_API_KEY
         },
+        // ANTHROPIC API KEY:
         {
           type: 'text',
           name: 'anthropic_api_key',
           message: `[optional] Enter your Anthropic API KEY`,
           initial: ANTHROPIC_API_KEY
         },
+        // JINA API KEY:
         {
           type: 'text',
           name: 'jina_api_key',
