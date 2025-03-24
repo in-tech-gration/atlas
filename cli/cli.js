@@ -53,7 +53,7 @@ export default class CLI {
       .option('-p, --pattern <pattern...>', 'Choose a pattern from the available patterns')
       .option('-t, --temperature [temperature]', 'Set temperature (default: 0.7)')
       .option('-m, --model [model]', 'Choose model (or show currently selected model [without parameters')
-      .option('-S, --setup', 'Run setup for all reconfigurable parts of atlas')
+      .option('-S, --setup [type]', 'Run setup for all reconfigurable parts of atlas. Use -S model to only set up the model. Use -S show to display API keys.')
       .option('-l, --listpatterns', 'List all patterns')
       .option('--update', 'Update app version')
       .option('-c, --copy', 'Copy to clipboard')
@@ -223,6 +223,8 @@ export default class CLI {
       const OPENAI_API_KEY = getAPIKey("OPENAI_API_KEY");
       const ANTHROPIC_API_KEY = getAPIKey("ANTHROPIC_API_KEY");
 
+      const apiPromptType = options.setup === "show" ? "text" : "password";
+
       // https://github.com/terkelg/prompts?tab=readme-ov-file#-types
       const questions = [
         // PROVIDER SELECTION:
@@ -297,49 +299,57 @@ export default class CLI {
         },
         // OPENAI API KEY:
         {
-          type: 'text',
+          type: apiPromptType,
           name: 'openai_api_key',
           message: `[optional] Enter your OpenAI API KEY`,
           initial: OPENAI_API_KEY
         },
         // TAVILY API KEY:
         {
-          type: 'text',
+          type: apiPromptType,
           name: 'tavily_api_key',
           message: `[optional] Enter your TAVILY API KEY (used in patterns that require Web search)`,
           initial: TAVILY_API_KEY
         },
         // TOGETHER.AI API KEY:
         {
-          type: 'text',
+          type: apiPromptType,
           name: 'together_ai_api_key',
           message: `[optional] Enter your Together.AI API KEY (used for cloud access to LLMs)`,
           initial: TOGETHER_AI_API_KEY
         },
         // GROQ API KEY:
         {
-          type: 'text',
+          type: apiPromptType,
           name: 'groq_api_key',
           message: `[optional] Enter your Groq API KEY (used for cloud access to LLMs)`,
           initial: GROQ_API_KEY
         },
         // ANTHROPIC API KEY:
         {
-          type: 'text',
+          type: apiPromptType,
           name: 'anthropic_api_key',
           message: `[optional] Enter your Anthropic API KEY`,
           initial: ANTHROPIC_API_KEY
         },
         // JINA API KEY:
         {
-          type: 'text',
+          type: apiPromptType,
           name: 'jina_api_key',
           message: `[optional] Enter your Jina.AI API KEY`,
           initial: JINA_API_KEY
         },
       ];
 
-      const response = await prompts(questions);
+      const response = await prompts(questions, {
+        onSubmit: (prompt, answer)=>{
+          // Abort Prompt chaining and return collected responses if the 
+          // user has used the --setup, -S model option:
+          if ( prompt.name === "model" && options.setup === "model" ){
+            return true;
+          }
+        }
+      });
 
       if (response.openai_api_key) {
         saveAPIKey("OPENAI_API_KEY", response.openai_api_key);

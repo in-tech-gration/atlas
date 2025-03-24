@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Language Models is now a list that contains objects with `name`, `context_window`, `desciption` and `max_output_tokens` properties.
+- Hide API keys during setup by default. Add `--setup show` option to show the keys.
 
 ## [0.1.53] - 20/03/2025
 
