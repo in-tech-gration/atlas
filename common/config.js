@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import * as dotenv from 'dotenv';
 
 export const PATTERNS_DIR = "patterns";
+export const ATLAS_PATTERNS_DIR = "patterns-atlas";
 const ENV_PATH = join(homedir(), '.config', 'configstore', '.atlas-fabric.env');
 dotenv.config({ path: ENV_PATH });
 

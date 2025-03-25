@@ -19,6 +19,7 @@ import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import chalk from 'chalk';
 import prompts from "prompts";
 import {
+  ATLAS_PATTERNS_DIR,
   getAPIKey,
   PATTERNS_DIR,
   saveAPIKey,
@@ -491,12 +492,23 @@ export default class CLI {
         return console.log("Please provide some content.");
       }
 
-      const patternFilePath = path.join(__dirname, "..", PATTERNS_DIR, pattern, "system.md");
+      // First, check if the pattern exists in the primary patterns directory: patterns-atlas/
+      let patternFilePath = path.join(__dirname, "..", ATLAS_PATTERNS_DIR, pattern, "system.md");
 
       try {
+
         await fs.access(patternFilePath);
+
       } catch {
-        return console.log(`Error initializing pattern: ${pattern}. Please check any misspellings.`);
+
+        // If the pattern does not exist in the primary directory, check the alternative patterns directory: patterns/
+        patternFilePath = path.join(__dirname, "..", PATTERNS_DIR, pattern, "system.md");
+
+        try {
+          await fs.access(patternFilePath);
+        } catch {
+          return console.log(`Error initializing pattern: ${pattern}. Neither primary nor alternative pattern files exist.`);
+        }
       }
 
       const llmProvider = this.config.get('llm_provider');

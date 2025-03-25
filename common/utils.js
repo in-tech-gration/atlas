@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path, { dirname } from "node:path";
 import chalk from 'chalk';
-import { PATTERNS_DIR } from "./config.js";
+import { ATLAS_PATTERNS_DIR, PATTERNS_DIR } from "./config.js";
 import { fileURLToPath } from "url";
 // import { execSync } from 'child_process';
 
@@ -10,20 +10,39 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export async function listPatterns() {
 
-  const patternsDir = path.join(__dirname, "..", PATTERNS_DIR);
+  const primaryPatternsDir = path.join(__dirname, "..", ATLAS_PATTERNS_DIR);
+  const secondaryPatternsDir = path.join(__dirname, "..", PATTERNS_DIR);
 
-  try {
-
-    const entries = await fs.readdir(patternsDir, { withFileTypes: true });
-    const patterns = entries
-      .filter(entry => entry.isDirectory())
-      .map(entry => entry.name);
-
-    console.log(patterns.join("\n"));
-
-  } catch (err) {
-    console.error("Error reading folder:", err);
+  async function getPatternsFromDir(dir) {
+    try {
+      const entries = await fs.readdir(dir, { withFileTypes: true });
+      return entries
+        .filter(entry => entry.isDirectory())
+        .map(entry => entry.name);
+    } catch (err) {
+      console.error(`Error reading folder ${dir}:`, err);
+      return [];
+    }
   }
+
+  const patterns1 = await getPatternsFromDir(primaryPatternsDir);
+  const patterns2 = await getPatternsFromDir(secondaryPatternsDir);
+
+  console.log("Available patterns:");
+  console.log("===================");
+
+  console.log(chalk.green.bold("Atlas Patterns:\n"));
+  patterns1.forEach(pattern => {
+    console.log("   " + chalk.green(pattern));
+  });
+
+  console.log(chalk.green.bold("\nFabric Patterns:\n"));
+  patterns2.forEach(pattern => {
+    console.log("   " + chalk.green(pattern));
+  });
+  // const allPatterns = [...patterns1, ...patterns2];
+  // console.log(allPatterns.join("\n"));
+
 }
 
 export class OllamaError extends Error {

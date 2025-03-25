@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Show warning when text input is larger that the current context window (Ollama)
+- Add primary (`patterns-atlas/`) and secondary (`patterns/`) pattern directories
 
 ### Updated
 
