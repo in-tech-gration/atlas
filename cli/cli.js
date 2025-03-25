@@ -53,11 +53,13 @@ export default class CLI {
       .option('-p, --pattern <pattern...>', 'Choose a pattern from the available patterns')
       .option('-t, --temperature [temperature]', 'Set temperature (default: 0.7)')
       .option('-m, --model [model]', 'Choose model (or show currently selected model [without parameters')
+      .option('--context-window <size>', 'Set context window size (default: 2048)')
       .option('-S, --setup [type]', 'Run setup for all reconfigurable parts of atlas. Use -S model to only set up the model. Use -S show to display API keys.')
       .option('-l, --listpatterns', 'List all patterns')
       .option('--update', 'Update app version')
       .option('-c, --copy', 'Copy to clipboard')
       .option('-w, --web [search]', 'Search the web (using Tavily)')
+      .option('--verbose', 'Verbose output (when available)')
       // TODO:
       // -s, --stream               Stream
       // -L, --listmodels           List all available models
@@ -140,10 +142,13 @@ export default class CLI {
 
     if (provider === "provider_ollama") {
 
+      const numCtx = options.numCtx ? options.numCtx : 2048;
+
       chatModel = new ChatOllama({
         baseUrl: "http://localhost:11434",
         model,
-        temperature
+        temperature,
+        numCtx,
       });
       isSupported = true;
     
@@ -513,6 +518,10 @@ export default class CLI {
             llmOptions.temperature = parseFloat(options.temperature);
           }
 
+          if ("contextWindow" in options && llmProvider === "provider_ollama") {
+            llmOptions.numCtx = parseInt(options.contextWindow);
+          }
+
           const { isSupported, errorMessage } = this.initLLM(llmOptions);
 
           if (!isSupported) {
@@ -529,11 +538,19 @@ export default class CLI {
             //   content = content.replace(/^INPUT:/m, stdin ? stdin : data);
             // }
             // return console.log({ content });
+            const systemMessage = new SystemMessage(content);
+            const humanMessage = new HumanMessage(stdin ? stdin : data);
 
             const response = await this.chatModel.invoke([
-              new SystemMessage(content),
-              new HumanMessage(stdin ? stdin : data)
+              systemMessage,
+              humanMessage,
             ]);
+
+            if ( options.verbose ){
+              console.log(chalk.gray("[VERBOSE OUTPUT ENABLED][ TOTAL INPUT LENGTH ]"));
+              console.log(systemMessage.content.length + humanMessage.content.length);
+              console.log("\n");
+            }
 
             let output;
 
@@ -547,7 +564,12 @@ export default class CLI {
               output = response;
             }
 
-            console.log(output);
+            if ( options.verbose ){
+              console.log(chalk.gray("[VERBOSE OUTPUT ENABLED][ RESPONSE ]"));
+              console.log(response);
+            } else {
+              console.log(output);
+            }
 
             if ( options.copy ){
               clipboardy.writeSync(output);

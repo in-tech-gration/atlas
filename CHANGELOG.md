@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add 3 more Anthropic models: `claude-3-5-sonnet-latest`, `claude-3-7-sonnet-latest`, `claude-3-5-haiku-latest`, `claude-3-haiku` and `claude-3-opus-latest`
+- Add verbose output (e.g. metadata, input/output tokens, etc.) using `--verbose`
+- Add option `--context-window <size>` to pass custom context window value to Ollama (default: 2048)
 
 ### Changed
 
