@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Show warning when text input is larger that the current context window (Ollama)
 
+### Updated
+
+- Update patterns from upstream `fabric` branch
+
 ## [0.1.54] - 25/03/2025
 
 ### Added
