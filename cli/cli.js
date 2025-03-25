@@ -546,13 +546,25 @@ export default class CLI {
               humanMessage,
             ]);
 
+            let output;
+            let totalInputLength = systemMessage.content.length + humanMessage.content.length;
+
             if ( options.verbose ){
               console.log(chalk.gray("[VERBOSE OUTPUT ENABLED][ TOTAL INPUT LENGTH ]"));
-              console.log(systemMessage.content.length + humanMessage.content.length);
+              console.log(totalInputLength);
               console.log("\n");
             }
 
-            let output;
+            // Check if the input length exceeds the context window (Ollama only):
+            if ( llmProvider === "provider_ollama" ){
+              let currentContextWindow = 2048;
+              if ( options.contextWindow ){
+                currentContextWindow = parseInt(options.contextWindow);
+              }
+              if ( totalInputLength > currentContextWindow ){
+                console.log(chalk.redBright(`[ WARNING ] Your input (${totalInputLength}) is longer that the current context window (${currentContextWindow}). Please consider reducing the input size to fit the current context window or increasing the context window using the --context-window <size> option.`));
+              }
+            }
 
             if (
               llmProvider === "provider_ollama" 

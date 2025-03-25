@@ -1,6 +1,6 @@
 {
   "name": "atlas-fabric",
-  "version": "0.1.54",
+  "version": "0.1.55",
   "description": "A Node.js implementation of fabric",
   "main": "main.js",
   "type": "module",
