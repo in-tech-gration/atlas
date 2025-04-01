@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Ability to play your favorite music using `mpg123` (beta).
 - Add support for GEMINI AI API
+- Add Speech Synthesis via the ElevenLabs API and the `--voice` option (beta).
 
 ## [0.1.55] - 25/03/2025
 
