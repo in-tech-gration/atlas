@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Ability to play your favorite music using `mpg123` (beta).
+- Add support for GEMINI AI API
 
 ## [0.1.55] - 25/03/2025
 

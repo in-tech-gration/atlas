@@ -232,6 +232,7 @@ export default class CLI {
       const JINA_API_KEY = getAPIKey("JINA_API_KEY");
       const OPENAI_API_KEY = getAPIKey("OPENAI_API_KEY");
       const ANTHROPIC_API_KEY = getAPIKey("ANTHROPIC_API_KEY");
+      const GEMINI_API_KEY = getAPIKey("GEMINI_API_KEY");
 
       const apiPromptType = options.setup === "show" ? "text" : "password";
 
@@ -349,6 +350,13 @@ export default class CLI {
           message: `[optional] Enter your Jina.AI API KEY`,
           initial: JINA_API_KEY
         },
+        // GEMINI API KEY:
+        {
+          type: apiPromptType,
+          name: 'gemini_api_key',
+          message: `[optional] Enter your Gemini API KEY`,
+          initial: GEMINI_API_KEY
+        },
       ];
 
       const response = await prompts(questions, {
@@ -378,6 +386,9 @@ export default class CLI {
       }
       if (response.anthropic_api_key) {
         saveAPIKey("ANTHROPIC_API_KEY", response.anthropic_api_key);
+      }
+      if (response.gemini_api_key) {
+        saveAPIKey("GEMINI_API_KEY", response.gemini_api_key);
       }
 
       if (!response.llm_provider) {
