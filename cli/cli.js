@@ -28,6 +28,7 @@ import {
 import { providers, models } from "../common/providers.js";
 import clipboardy from 'clipboardy';
 import runPlay from "../plugins/experimental/play.js";
+import { ElevenLabsClient, play } from "elevenlabs";
 
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
@@ -71,6 +72,7 @@ export default class CLI {
       // .version(this.version)
 
       // Experimental:
+      .addOption(new Option('--voice', 'Use speech synthesis').hideHelp())
       .addOption(new Option('--play [play]', 'Play your favorite music').hideHelp())
 
     program.addHelpText('before', chalk.green.bold(`[[ Welcome to atlas v${this.version} ]]`));
@@ -243,6 +245,7 @@ export default class CLI {
       const OPENAI_API_KEY = getAPIKey("OPENAI_API_KEY");
       const ANTHROPIC_API_KEY = getAPIKey("ANTHROPIC_API_KEY");
       const GOOGLE_API_KEY = getAPIKey("GOOGLE_API_KEY");
+      const ELEVENLABS_API_KEY = getAPIKey("ELEVENLABS_API_KEY");
 
       const apiPromptType = options.setup === "show" ? "text" : "password";
 
@@ -367,6 +370,13 @@ export default class CLI {
           message: `[optional] Enter your Google API KEY (leave empty to skip)`,
           initial: GOOGLE_API_KEY
         },
+        // ELEVEN LABS API KEY:
+        {
+          type: apiPromptType,
+          name: 'elevenlabs_api_key',
+          message: `[optional] Enter your Eleven Labs API KEY (leave empty to skip)`,
+          initial: ELEVENLABS_API_KEY
+        },
       ];
 
       const response = await prompts(questions, {
@@ -397,6 +407,10 @@ export default class CLI {
       if (response.anthropic_api_key) {
         saveAPIKey("ANTHROPIC_API_KEY", response.anthropic_api_key);
       }
+      if (response.elevenlabs_api_key) {
+        saveAPIKey("ELEVENLABS_API_KEY", response.elevenlabs_api_key);
+      }
+
       if (response.google_api_key) {
         saveAPIKey("GOOGLE_API_KEY", response.google_api_key);
       }
@@ -621,6 +635,24 @@ export default class CLI {
               console.log(output);
             }
 
+            if (options.voice){
+              // https://github.com/elevenlabs/elevenlabs-js
+              const elevenlabs = new ElevenLabsClient({/* apiKey: "" */});
+              const audio = await elevenlabs.generate({
+                voice: "Sarah",
+                text: output,
+                model_id: "eleven_multilingual_v2",
+              });
+              if ( options.verbose ){
+                // const usage = await elevenlabs.usage.getCharactersUsageMetrics({
+                //   start_unix: 1,
+                //   end_unix: 1
+                // });
+                // console.log({ usage });
+              }
+              await play(audio);
+            }
+            
             if ( options.copy ){
               clipboardy.writeSync(output);
               console.log(chalk.gray("[Response copied to clipboard]"));
