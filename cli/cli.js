@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import os from "node:os";;
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import { ChatOllama } from "@langchain/ollama";
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatAnthropic } from "@langchain/anthropic";
@@ -26,6 +26,7 @@ import {
 } from "../common/config.js";
 import { providers, models } from "../common/providers.js";
 import clipboardy from 'clipboardy';
+import runPlay from "../plugins/experimental/play.js";
 
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
@@ -67,6 +68,9 @@ export default class CLI {
       // -o, --output=              Output to file
       // Ref: https://github.com/danielmiessler/fabric/?tab=readme-ov-file#usage
       // .version(this.version)
+
+      // Experimental:
+      .addOption(new Option('--play [play]', 'Play your favorite music').hideHelp())
 
     program.addHelpText('before', chalk.green.bold(`[[ Welcome to atlas v${this.version} ]]`));
 
@@ -634,6 +638,11 @@ export default class CLI {
           console.log("File does not exist.", error);
         });
 
+    }
+
+    // EXPERIMENTAL:
+    if (options.play) {
+      return runPlay({ options, stdin });
     }
 
     program.help();
