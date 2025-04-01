@@ -322,49 +322,49 @@ export default class CLI {
         {
           type: apiPromptType,
           name: 'openai_api_key',
-          message: `[optional] Enter your OpenAI API KEY`,
+          message: `[optional] Enter your OpenAI API KEY (leave empty to skip)`,
           initial: OPENAI_API_KEY
         },
         // TAVILY API KEY:
         {
           type: apiPromptType,
           name: 'tavily_api_key',
-          message: `[optional] Enter your TAVILY API KEY (used in patterns that require Web search)`,
+          message: `[optional] Enter your TAVILY API KEY (used in patterns that require Web search)(leave empty to skip)`,
           initial: TAVILY_API_KEY
         },
         // TOGETHER.AI API KEY:
         {
           type: apiPromptType,
           name: 'together_ai_api_key',
-          message: `[optional] Enter your Together.AI API KEY (used for cloud access to LLMs)`,
+          message: `[optional] Enter your Together.AI API KEY (used for cloud access to LLMs)(leave empty to skip)`,
           initial: TOGETHER_AI_API_KEY
         },
         // GROQ API KEY:
         {
           type: apiPromptType,
           name: 'groq_api_key',
-          message: `[optional] Enter your Groq API KEY (used for cloud access to LLMs)`,
+          message: `[optional] Enter your Groq API KEY (used for cloud access to LLMs)(leave empty to skip)`,
           initial: GROQ_API_KEY
         },
         // ANTHROPIC API KEY:
         {
           type: apiPromptType,
           name: 'anthropic_api_key',
-          message: `[optional] Enter your Anthropic API KEY`,
+          message: `[optional] Enter your Anthropic API KEY (leave empty to skip)`,
           initial: ANTHROPIC_API_KEY
         },
         // JINA API KEY:
         {
           type: apiPromptType,
           name: 'jina_api_key',
-          message: `[optional] Enter your Jina.AI API KEY`,
+          message: `[optional] Enter your Jina.AI API KEY (leave empty to skip)`,
           initial: JINA_API_KEY
         },
         // GOOGLE API KEY:
         {
           type: apiPromptType,
           name: 'google_api_key',
-          message: `[optional] Enter your Google API KEY`,
+          message: `[optional] Enter your Google API KEY (leave empty to skip)`,
           initial: GOOGLE_API_KEY
         },
       ];
