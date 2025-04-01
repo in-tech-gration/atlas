@@ -7,6 +7,7 @@ import { ChatOllama } from "@langchain/ollama";
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatAnthropic } from "@langchain/anthropic";
 import { TogetherAI } from "@langchain/community/llms/togetherai";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatGroq } from "@langchain/groq";
 import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
 import {
@@ -179,6 +180,14 @@ export default class CLI {
 
     }
 
+    if (provider === "provider_gemini"){
+      chatModel = new ChatGoogleGenerativeAI({
+        model,
+        temperature,
+      });
+      isSupported = true;
+    }
+
     this.chatModel = chatModel;
 
     return { isSupported };
@@ -232,7 +241,7 @@ export default class CLI {
       const JINA_API_KEY = getAPIKey("JINA_API_KEY");
       const OPENAI_API_KEY = getAPIKey("OPENAI_API_KEY");
       const ANTHROPIC_API_KEY = getAPIKey("ANTHROPIC_API_KEY");
-      const GEMINI_API_KEY = getAPIKey("GEMINI_API_KEY");
+      const GOOGLE_API_KEY = getAPIKey("GOOGLE_API_KEY");
 
       const apiPromptType = options.setup === "show" ? "text" : "password";
 
@@ -350,12 +359,12 @@ export default class CLI {
           message: `[optional] Enter your Jina.AI API KEY`,
           initial: JINA_API_KEY
         },
-        // GEMINI API KEY:
+        // GOOGLE API KEY:
         {
           type: apiPromptType,
-          name: 'gemini_api_key',
-          message: `[optional] Enter your Gemini API KEY`,
-          initial: GEMINI_API_KEY
+          name: 'google_api_key',
+          message: `[optional] Enter your Google API KEY`,
+          initial: GOOGLE_API_KEY
         },
       ];
 
@@ -387,8 +396,8 @@ export default class CLI {
       if (response.anthropic_api_key) {
         saveAPIKey("ANTHROPIC_API_KEY", response.anthropic_api_key);
       }
-      if (response.gemini_api_key) {
-        saveAPIKey("GEMINI_API_KEY", response.gemini_api_key);
+      if (response.google_api_key) {
+        saveAPIKey("GOOGLE_API_KEY", response.google_api_key);
       }
 
       if (!response.llm_provider) {
@@ -597,6 +606,7 @@ export default class CLI {
               llmProvider === "provider_ollama" 
               || llmProvider === "provider_groq" 
               || llmProvider === "provider_anthropic"
+              || llmProvider === "provider_gemini"
             ) {
               output = response.content;
             } else {

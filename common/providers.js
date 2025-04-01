@@ -24,7 +24,12 @@ export const providers = [
     description: 'https://openai.com',
     value: 'provider_open_ai'
   },
-];;
+  {
+    title: 'Gemini AI',
+    description: 'https://gemini.google.com',
+    value: 'provider_gemini'
+  },
+];
 
 export const models = {
 
@@ -77,6 +82,24 @@ export const models = {
     { name: "deepseek-r1-distill-llama-70b" },
     { name: "llama3-70b-8192" },
     { name: "gemma2-9b-it" },
+  ],
+
+  provider_gemini: [
+    { 
+      name: "gemini-1.5-pro",
+      description: "Complex reasoning tasks requiring more intelligence", 
+      modality: ["text"],
+    },
+    {
+      name: "gemini-1.5-flash",
+      description: "Fast and versatile performance across a diverse variety of tasks",
+      modality: ["text", "image", "video", "audio"],
+    },
+    {
+      name:"gemini-2.0-flash-lite",
+      description: "Cost efficiency and low latency",
+      modality: ["text", "image", "video", "audio"],
+    }
   ],
 
 }
