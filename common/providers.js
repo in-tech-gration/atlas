@@ -84,6 +84,7 @@ export const models = {
     { name: "gemma2-9b-it" },
   ],
 
+  // https://ai.google.dev/gemini-api/docs/models
   provider_gemini: [
     { 
       name: "gemini-1.5-pro",

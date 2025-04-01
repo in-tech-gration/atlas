@@ -180,6 +180,7 @@ export default class CLI {
 
     }
 
+    // https://js.langchain.com/docs/integrations/chat/google_generativeai/
     if (provider === "provider_gemini"){
       chatModel = new ChatGoogleGenerativeAI({
         model,
