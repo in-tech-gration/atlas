@@ -29,10 +29,17 @@ import { providers, models } from "../common/providers.js";
 import clipboardy from 'clipboardy';
 import runPlay from "../plugins/experimental/play.js";
 import { ElevenLabsClient, play } from "elevenlabs";
+import initializeLLM from "../common/llm.js";
 
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Catch uncaught global errors
+process.on("uncaughtException", (error) => {
+  console.error(chalk.redBright(`Error: ${error}`));
+  process.exit(1);
+});
 
 export default class CLI {
 
@@ -550,38 +557,10 @@ export default class CLI {
         }
       }
 
-      const llmProvider = this.config.get('llm_provider');
-      const model = this.config.get('model');
-
-      if (!llmProvider || !model) {
-        return console.log(chalk.redBright("You must select a language model in order to use the AI capabilities of atlas"));
-      }
+      const { llmProvider, model } = initializeLLM({ instance: this, options });
 
       return fs.readFile(patternFilePath, "utf8")
         .then(async (content) => {
-
-          const llmOptions = {
-            provider: llmProvider,
-            model
-          }
-
-          if ("temperature" in options) {
-            llmOptions.temperature = parseFloat(options.temperature);
-          }
-
-          if ("contextWindow" in options && llmProvider === "provider_ollama") {
-            llmOptions.numCtx = parseInt(options.contextWindow);
-          }
-
-          const { isSupported, errorMessage } = this.initLLM(llmOptions);
-
-          if (!isSupported) {
-            return console.log(`LLM Provider currently not supported. Please run ${chalk.bold("atlas -S")} and select supported provider.`);
-          }
-
-          if (errorMessage){
-            return console.log(chalk.red(errorMessage));
-          }
 
           try {
 
