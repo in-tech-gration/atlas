@@ -31,6 +31,7 @@ import runPlay from "../plugins/experimental/play.js";
 import { ElevenLabsClient, play } from "elevenlabs";
 import initializeLLM from "../common/llm.js";
 import yoctoSpinner from 'yocto-spinner';
+import matter from 'gray-matter';
 
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
@@ -614,7 +615,12 @@ export default class CLI {
       const { llmProvider, model } = initializeLLM({ instance: this, options });
 
       return fs.readFile(patternFilePath, "utf8")
-        .then(async (content) => {
+        .then(async (fileContent) => {
+
+          const parsed = matter(fileContent);
+          const hasFm = Object.keys(parsed.data).length > 0; 
+          // console.log( hasFm ? parsed.data : "No frontmatter found." );
+          const content = parsed.content;
 
           try {
 

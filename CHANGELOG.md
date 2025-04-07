@@ -5,13 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.56] - 25/03/2025
+## [0.1.56] - 08/04/2025
 
 ### Added
 
 - Ability to play your favorite music using `mpg123` (beta).
 - Add support for GEMINI AI API
 - Add Speech Synthesis via the ElevenLabs API and the `--voice` option (beta).
+- Add option `--describe` for image recognition (must use model that supports image modality)
+- Add support for `Frontmatter` parsing
 
 ## [0.1.55] - 25/03/2025
 
