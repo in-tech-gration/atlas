@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add Speech Synthesis via the ElevenLabs API and the `--voice` option (beta).
 - Add option `--describe` for image recognition (must use model that supports image modality)
 - Add support for `Frontmatter` parsing
+- Add `--srt2json` option for converting SRT files into JSON files via `srt-parser-2` 
 
 ## [0.1.55] - 25/03/2025
 

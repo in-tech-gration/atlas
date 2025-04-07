@@ -15,6 +15,7 @@ import {
   listPatterns,
   OllamaError,
   selfUpdate,
+  srtToJSON,
 } from "../common/utils.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import chalk from 'chalk';
@@ -73,6 +74,7 @@ export default class CLI {
       .option('-c, --copy', 'Copy to clipboard')
       .option('-w, --web [search]', 'Search the web (using Tavily)')
       .option('--verbose', 'Verbose output (when available)')
+      .option('--srt2json <file>', 'Convert SRT file to JSON')
       // TODO:
       // -s, --stream               Stream
       // -L, --listmodels           List all available models
@@ -208,6 +210,16 @@ export default class CLI {
   }
 
   async execute({ options, program, stdin }) {
+
+    if (options.srt2json) {
+      const srtFilePath = path.resolve(options.srt2json);
+      // const srtFileName = path.basename(srtFilePath);
+      // const srtFileDir = path.dirname(srtFilePath);
+      const srtFileContent = await fs.readFile(srtFilePath, "utf8");
+      const srtArray = srtToJSON(srtFileContent);
+      process.stdout.write(JSON.stringify(srtArray, null, 2)); // Do not use console.log as it truncates long objects.
+      return;
+    }
 
     if (options.listpatterns) {
 
