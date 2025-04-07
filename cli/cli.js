@@ -30,6 +30,7 @@ import clipboardy from 'clipboardy';
 import runPlay from "../plugins/experimental/play.js";
 import { ElevenLabsClient, play } from "elevenlabs";
 import initializeLLM from "../common/llm.js";
+import yoctoSpinner from 'yocto-spinner';
 
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
@@ -81,6 +82,7 @@ export default class CLI {
       // Experimental:
       .addOption(new Option('--voice', 'Use speech synthesis').hideHelp())
       .addOption(new Option('--play [play]', 'Play your favorite music').hideHelp())
+      .addOption(new Option('--describe <file>', 'Describe an image file').hideHelp())
 
     program.addHelpText('before', chalk.green.bold(`[[ Welcome to atlas v${this.version} ]]`));
 
@@ -529,6 +531,58 @@ export default class CLI {
     //   listCalendarEvents({ maxResults: 12 });
     //   return;
     // }
+
+    // https://js.langchain.com/docs/how_to/multimodal_inputs/
+    if (options.describe) {
+      try {
+
+        const { llmProvider, model } = initializeLLM({ instance: this, options });
+        const chatModel = this.chatModel;
+        const selectedModelDetails = models[llmProvider].find( m => {
+          return m.name === model
+        });
+
+        if ( !selectedModelDetails || !selectedModelDetails?.modality?.includes("images") ){
+          throw new Error(`Model ${model} probably does not support images as input modality.`);
+        }
+
+        // console.log("Describe:", options.describe);
+        const resolvedPath = path.resolve(options.describe);
+        try {
+          await fs.access(resolvedPath);
+        } catch (error) {
+          throw new Error(`File not found at path: ${resolvedPath}`);
+        }
+        const imageData = await fs.readFile(resolvedPath);
+        const message = new HumanMessage({
+          content: [
+            {
+              type: "text",
+              text: "Please describe the image in full detail.",
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${imageData.toString("base64")}`,
+              },
+            },
+          ],
+        });
+
+        const spinner = yoctoSpinner({text: `Analyzing image file: ${resolvedPath}...`}).start();
+        const response = await chatModel.invoke([message]);
+        spinner.success();
+        console.log(response.content);
+
+      } catch (error) {
+
+        console.log(
+          chalk.redBright("Error:", error.message)
+        );
+
+      }
+      return;
+    }
 
     if (options.pattern) {
 

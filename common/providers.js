@@ -99,13 +99,36 @@ export const models = {
     {
       name: "gemini-1.5-flash",
       description: "Fast and versatile performance across a diverse variety of tasks",
-      modality: ["text", "image", "video", "audio"],
+      modality: ["text", "images", "video", "audio"],
     },
     {
       name:"gemini-2.0-flash-lite",
       description: "Cost efficiency and low latency",
-      modality: ["text", "image", "video", "audio"],
+      modality: ["text", "images", "video", "audio"],
     }
   ],
+
+  provider_ollama: [
+    { 
+      name: "llama3.2-vision:latest",
+      context_window: 131_072,
+      // max_output_tokens: 4096,
+      modality: ["text", "images"],
+     },
+     {
+      name: "llama3.2-vision:11b",
+      context_window: 131_072,
+      // max_output_tokens: 4096,
+      modality: ["text", "images"],
+     },
+     {
+      name: "llava:13b",
+      modality: ["text", "images"],
+     },
+     {
+      name: "bakllava:latest",
+      modality: ["text", "images"],
+     }
+  ]
 
 }
