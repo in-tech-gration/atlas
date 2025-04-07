@@ -23,6 +23,7 @@ import prompts from "prompts";
 import {
   ATLAS_PATTERNS_DIR,
   getAPIKey,
+  LAMBDAS_DIR,
   PATTERNS_DIR,
   saveAPIKey,
 } from "../common/config.js";
@@ -40,7 +41,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Catch uncaught global errors
 process.on("uncaughtException", (error) => {
-  console.error(chalk.redBright(`Error: ${error}`));
+  console.error(chalk.redBright(`${error}`));
   process.exit(1);
 });
 
@@ -86,6 +87,7 @@ export default class CLI {
       .addOption(new Option('--voice', 'Use speech synthesis').hideHelp())
       .addOption(new Option('--play [play]', 'Play your favorite music').hideHelp())
       .addOption(new Option('--describe <file>', 'Describe an image file').hideHelp())
+      .addOption(new Option('--lambda <lambda_name>', 'Parse input through a lambda function').hideHelp())
 
     program.addHelpText('before', chalk.green.bold(`[[ Welcome to atlas v${this.version} ]]`));
 
@@ -218,6 +220,28 @@ export default class CLI {
       const srtFileContent = await fs.readFile(srtFilePath, "utf8");
       const srtArray = srtToJSON(srtFileContent);
       process.stdout.write(JSON.stringify(srtArray, null, 2)); // Do not use console.log as it truncates long objects.
+      return;
+    }
+
+    if (options.lambda) {
+
+      const lambdaFile = options.lambda.split(":")[0];
+      const arg = options.lambda.split(":")[1];
+
+      let patternFilePath = path.join(__dirname, "..", LAMBDAS_DIR, "common", `${lambdaFile}.js`);
+
+      try {
+
+        await fs.access(patternFilePath);
+        const { default: lambdaFunction } = await import(patternFilePath);
+        process.stdout.write(lambdaFunction(stdin, arg));
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
       return;
     }
 
@@ -462,7 +486,7 @@ export default class CLI {
       return selfUpdate();
     }
 
-    if (options.model && typeof options.model === "boolean"){
+    if (options.model && typeof options.model === "boolean" && !options.pattern) {
       
       let llmProviderName; 
       const llmProvider = this.config.get('llm_provider');
@@ -632,7 +656,7 @@ export default class CLI {
           const parsed = matter(fileContent);
           const hasFm = Object.keys(parsed.data).length > 0; 
           // console.log( hasFm ? parsed.data : "No frontmatter found." );
-          const content = parsed.content;
+          let content = parsed.content;
 
           try {
 
@@ -640,6 +664,23 @@ export default class CLI {
             //   content = content.replace(/^INPUT:/m, stdin ? stdin : data);
             // }
             // return console.log({ content });
+
+            const regex = /{{(.*?)}}/g;
+            const matches = content.match(regex);
+
+            // [WiP] Find all {{...}} variables in the content and replace them based on the variables provided:
+            // const variables = {};
+            // matches.forEach(match => {
+            //   const variableName = match.replace(/{{|}}/g, "").trim();
+            //   variables[variableName] = data;
+            // });
+            // console.log(variables);
+
+            // Replace all {{...}} with the data provided:
+            if ( matches && data ){
+              content = content.replace(/{{(.*?)}}/g, data);
+            }
+
             const systemMessage = new SystemMessage(content);
             const humanMessage = new HumanMessage(stdin ? stdin : data);
 

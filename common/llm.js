@@ -1,11 +1,22 @@
+import chalk from "chalk";
+
 export default function initializeLLM({ instance, options } = {}) {
 
     if (!instance) {
         throw new Error("CLI instance is required");
     }
 
-    const llmProvider = instance.config.get('llm_provider');
-    const model = instance.config.get('model');
+    let llmProvider = instance.config.get('llm_provider');
+    let model = instance.config.get('model');
+
+    if (options.model && typeof options.model === "string") {
+        llmProvider = "provider_" + options.model.split(":")[0];
+        model = options.model.split(":").slice(1).join(":");
+    }
+
+    if (options.model && typeof options.model === "boolean") {
+        throw new Error(chalk.redBright("Model name is required"));
+    }
 
     if (!llmProvider || !model) {
         return console.log(chalk.redBright("You must select a language model in order to use the AI capabilities of atlas"));

@@ -10,11 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Ability to play your favorite music using `mpg123` (beta).
-- Add support for GEMINI AI API
+- Add support for GEMINI AI API.
 - Add Speech Synthesis via the ElevenLabs API and the `--voice` option (beta).
-- Add option `--describe` for image recognition (must use model that supports image modality)
-- Add support for `Frontmatter` parsing
-- Add `--srt2json` option for converting SRT files into JSON files via `srt-parser-2` 
+- Add option `--describe` for image recognition (must use model that supports image modality).
+- Add support for `Frontmatter` parsing.
+- Add `--srt2json` option for converting SRT files into JSON files via `srt-parser-2`.
+- Add the ability to set provider and model via the `--model` option while running a `--pattern`.
+- Add support for lambda functions via the `--lambdas` option.
 
 ## [0.1.55] - 25/03/2025
 
