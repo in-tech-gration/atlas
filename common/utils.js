@@ -8,22 +8,22 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+async function getPatternsFromDir(dir) {
+  try {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    return entries
+      .filter(entry => entry.isDirectory())
+      .map(entry => entry.name);
+  } catch (err) {
+    console.error(`Error reading folder ${dir}:`, err);
+    return [];
+  }
+}
+
 export async function listPatterns() {
 
   const primaryPatternsDir = path.join(__dirname, "..", ATLAS_PATTERNS_DIR);
   const secondaryPatternsDir = path.join(__dirname, "..", PATTERNS_DIR);
-
-  async function getPatternsFromDir(dir) {
-    try {
-      const entries = await fs.readdir(dir, { withFileTypes: true });
-      return entries
-        .filter(entry => entry.isDirectory())
-        .map(entry => entry.name);
-    } catch (err) {
-      console.error(`Error reading folder ${dir}:`, err);
-      return [];
-    }
-  }
 
   const patterns1 = await getPatternsFromDir(primaryPatternsDir);
   const patterns2 = await getPatternsFromDir(secondaryPatternsDir);
@@ -42,6 +42,25 @@ export async function listPatterns() {
   });
   // const allPatterns = [...patterns1, ...patterns2];
   // console.log(allPatterns.join("\n"));
+
+}
+
+export async function displayPatternInfo(pattern) {
+
+  const primaryPatternsDirSearch = path.join(__dirname, "..", ATLAS_PATTERNS_DIR, `${pattern}/system.md`);
+  const secondaryPatternsDirSearch = path.join(__dirname, "..", PATTERNS_DIR, `${pattern}/system.md`);
+
+  try {
+    const patternFileContents = await fs.readFile(primaryPatternsDirSearch, 'utf-8');
+    return console.log(patternFileContents);
+  } catch (err) {}
+
+  try {
+    const patternFileContents2 = await fs.readFile(secondaryPatternsDirSearch, 'utf-8');
+    return console.log(patternFileContents2);
+  } catch (err) {}
+
+  console.log(chalk.red.bold("Pattern not found!"));
 
 }
 

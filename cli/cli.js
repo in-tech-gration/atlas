@@ -13,6 +13,7 @@ import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
 import {
   getOllamaModels,
   listPatterns,
+  displayPatternInfo,
   OllamaError,
   selfUpdate,
   srtToJSON,
@@ -70,7 +71,7 @@ export default class CLI {
       .option('-m, --model [model]', 'Choose model (or show currently selected model [without parameters')
       .option('--context-window <size>', 'Set context window size (default: 2048)')
       .option('-S, --setup [type]', 'Run setup for all reconfigurable parts of atlas. Use -S model to only set up the model. Use -S show to display API keys.')
-      .option('-l, --listpatterns', 'List all patterns')
+      .option('-l, --listpatterns [pattern]', 'List all patterns or find information about a particular pattern.')
       .option('--update', 'Update app version')
       .option('-c, --copy', 'Copy to clipboard')
       .option('-w, --web [search]', 'Search the web (using Tavily)')
@@ -247,7 +248,14 @@ export default class CLI {
 
     if (options.listpatterns) {
 
-      return listPatterns();
+      if ( typeof options.listpatterns === "boolean" ){
+        return listPatterns();
+      }
+      if ( typeof options.listpatterns === "string" ){
+        return displayPatternInfo(options.listpatterns);
+      }
+
+      return;
 
     }
 
