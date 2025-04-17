@@ -35,6 +35,8 @@ import { ElevenLabsClient, play } from "elevenlabs";
 import initializeLLM from "../common/llm.js";
 import yoctoSpinner from 'yocto-spinner';
 import matter from 'gray-matter';
+// PLUGINS:
+import mountUnmount from "../plugins/mount/index.js"
 
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
@@ -77,6 +79,7 @@ export default class CLI {
       .option('-w, --web [search]', 'Search the web (using Tavily)')
       .option('--verbose', 'Verbose output (when available)')
       .option('--srt2json <file>', 'Convert SRT file to JSON')
+      .option('--mount <state>', 'Mount/unmount one or more drives: --mount on|off|set (MacOS)')
       // TODO:
       // -s, --stream               Stream
       // -L, --listmodels           List all available models
@@ -143,7 +146,7 @@ export default class CLI {
     if (provider === "provider_groq") {
 
       try {
-        
+
         chatModel = new ChatGroq({
           model,
           temperature,
@@ -152,13 +155,13 @@ export default class CLI {
           // other params...
           // apiKey: 
         });
-  
+
         isSupported = true;
-        
+
       } catch (error) {
-        
+
         return { isSupported: true, errorMessage: error.message }
-        
+
       }
 
     }
@@ -174,10 +177,10 @@ export default class CLI {
         numCtx,
       });
       isSupported = true;
-    
+
     }
 
-    if (provider === "provider_open_ai"){
+    if (provider === "provider_open_ai") {
 
       chatModel = new ChatOpenAI({
         model,
@@ -187,7 +190,7 @@ export default class CLI {
 
     }
 
-    if (provider === "provider_anthropic"){
+    if (provider === "provider_anthropic") {
 
       chatModel = new ChatAnthropic({
         model,
@@ -198,7 +201,7 @@ export default class CLI {
     }
 
     // https://js.langchain.com/docs/integrations/chat/google_generativeai/
-    if (provider === "provider_gemini"){
+    if (provider === "provider_gemini") {
       chatModel = new ChatGoogleGenerativeAI({
         model,
         temperature,
@@ -248,10 +251,10 @@ export default class CLI {
 
     if (options.listpatterns) {
 
-      if ( typeof options.listpatterns === "boolean" ){
+      if (typeof options.listpatterns === "boolean") {
         return listPatterns();
       }
-      if ( typeof options.listpatterns === "string" ){
+      if (typeof options.listpatterns === "string") {
         return displayPatternInfo(options.listpatterns);
       }
 
@@ -310,10 +313,10 @@ export default class CLI {
           type: 'select',
           name: 'llm_provider',
           message: 'Pick your LLM provider',
-          choices: (prev, all)=>{
-            if ( !ollamaModels ){
-              return providers.map( provider => {
-                if ( provider.value === "provider_ollama" ){
+          choices: (prev, all) => {
+            if (!ollamaModels) {
+              return providers.map(provider => {
+                if (provider.value === "provider_ollama") {
                   provider.title = "Ollama [Not installed]";
                   provider.disabled = true;
                 }
@@ -434,10 +437,10 @@ export default class CLI {
       ];
 
       const response = await prompts(questions, {
-        onSubmit: (prompt, answer)=>{
+        onSubmit: (prompt, answer) => {
           // Abort Prompt chaining and return collected responses if the 
           // user has used the --setup, -S model option:
-          if ( prompt.name === "model" && options.setup === "model" ){
+          if (prompt.name === "model" && options.setup === "model") {
             return true;
           }
         }
@@ -495,39 +498,39 @@ export default class CLI {
     }
 
     if (options.model && typeof options.model === "boolean" && !options.pattern) {
-      
-      let llmProviderName; 
+
+      let llmProviderName;
       const llmProvider = this.config.get('llm_provider');
 
-      if ( llmProvider ){
-        llmProviderName = providers.find( provider =>{
+      if (llmProvider) {
+        llmProviderName = providers.find(provider => {
           return provider.value === llmProvider;
         });
       }
 
       const model = this.config.get('model');
 
-      if ( llmProviderName ){
+      if (llmProviderName) {
         console.log(`Selected provider: ${chalk.green(llmProviderName.title)}`);
       }
 
-      if ( model ){
+      if (model) {
         console.log(`Selected model: ${chalk.green(model)}`);
       }
 
       return;
     }
 
-    if (options.web){
+    if (options.web) {
 
-      if ( typeof options.web === "boolean" ){
+      if (typeof options.web === "boolean") {
         return console.log("Missing search context. Please provide some text to search the web.")
       }
 
       let tavilyTool;
 
       try {
-        
+
         tavilyTool = new TavilySearchResults({
           maxResults: 3,
         });
@@ -536,7 +539,7 @@ export default class CLI {
 
         console.log(chalk.redBright("Error:", error.message));
 
-        if ( error.message.includes("No Tavily API key found") ){
+        if (error.message.includes("No Tavily API key found")) {
           console.log(`Run ${chalk.blue("atlas -S")} to set up your API keys.`);
         }
 
@@ -552,7 +555,7 @@ export default class CLI {
 
       let output = `Here are some search results while searching the web for "${options.web}":`
 
-      searchResultsJSON.forEach((result, index) =>{
+      searchResultsJSON.forEach((result, index) => {
         output += `\n\n`;
         output += `## Search result #${index}:\n\n`;
         output += `Title: ${result.title}\n`;
@@ -563,6 +566,11 @@ export default class CLI {
       console.log(output);
 
       return;
+    }
+
+    // PLUGIN: Mount/Unmount selected drives (Mac OS)
+    if (options.mount) {
+      return mountUnmount({ options, instance: this });
     }
 
     // WiP
@@ -583,11 +591,11 @@ export default class CLI {
 
         const { llmProvider, model } = initializeLLM({ instance: this, options });
         const chatModel = this.chatModel;
-        const selectedModelDetails = models[llmProvider].find( m => {
+        const selectedModelDetails = models[llmProvider].find(m => {
           return m.name === model
         });
 
-        if ( !selectedModelDetails || !selectedModelDetails?.modality?.includes("images") ){
+        if (!selectedModelDetails || !selectedModelDetails?.modality?.includes("images")) {
           throw new Error(`Model ${model} probably does not support images as input modality.`);
         }
 
@@ -614,7 +622,7 @@ export default class CLI {
           ],
         });
 
-        const spinner = yoctoSpinner({text: `Analyzing image file: ${resolvedPath}...`}).start();
+        const spinner = yoctoSpinner({ text: `Analyzing image file: ${resolvedPath}...` }).start();
         const response = await chatModel.invoke([message]);
         spinner.success();
         console.log(response.content);
@@ -662,7 +670,7 @@ export default class CLI {
         .then(async (fileContent) => {
 
           const parsed = matter(fileContent);
-          const hasFm = Object.keys(parsed.data).length > 0; 
+          const hasFm = Object.keys(parsed.data).length > 0;
           // console.log( hasFm ? parsed.data : "No frontmatter found." );
           let content = parsed.content;
 
@@ -685,7 +693,7 @@ export default class CLI {
             // console.log(variables);
 
             // Replace all {{...}} with the data provided:
-            if ( matches && data ){
+            if (matches && data) {
               content = content.replace(/{{(.*?)}}/g, data);
             }
 
@@ -700,26 +708,26 @@ export default class CLI {
             let output;
             let totalInputLength = systemMessage.content.length + humanMessage.content.length;
 
-            if ( options.verbose ){
+            if (options.verbose) {
               console.log(chalk.gray("[VERBOSE OUTPUT ENABLED][ TOTAL INPUT LENGTH ]"));
               console.log(totalInputLength);
               console.log("\n");
             }
 
             // Check if the input length exceeds the context window (Ollama only):
-            if ( llmProvider === "provider_ollama" ){
+            if (llmProvider === "provider_ollama") {
               let currentContextWindow = 2048;
-              if ( options.contextWindow ){
+              if (options.contextWindow) {
                 currentContextWindow = parseInt(options.contextWindow);
               }
-              if ( totalInputLength > currentContextWindow ){
+              if (totalInputLength > currentContextWindow) {
                 console.log(chalk.redBright(`[ WARNING ] Your input (${totalInputLength}) is longer that the current context window (${currentContextWindow}). Please consider reducing the input size to fit the current context window or increasing the context window using the --context-window <size> option.`));
               }
             }
 
             if (
-              llmProvider === "provider_ollama" 
-              || llmProvider === "provider_groq" 
+              llmProvider === "provider_ollama"
+              || llmProvider === "provider_groq"
               || llmProvider === "provider_anthropic"
               || llmProvider === "provider_gemini"
             ) {
@@ -728,22 +736,22 @@ export default class CLI {
               output = response;
             }
 
-            if ( options.verbose ){
+            if (options.verbose) {
               console.log(chalk.gray("[VERBOSE OUTPUT ENABLED][ RESPONSE ]"));
               console.log(response);
             } else {
               console.log(output);
             }
 
-            if (options.voice){
+            if (options.voice) {
               // https://github.com/elevenlabs/elevenlabs-js
-              const elevenlabs = new ElevenLabsClient({/* apiKey: "" */});
+              const elevenlabs = new ElevenLabsClient({/* apiKey: "" */ });
               const audio = await elevenlabs.generate({
                 voice: "Sarah",
                 text: output,
                 model_id: "eleven_multilingual_v2",
               });
-              if ( options.verbose ){
+              if (options.verbose) {
                 // const usage = await elevenlabs.usage.getCharactersUsageMetrics({
                 //   start_unix: 1,
                 //   end_unix: 1
@@ -752,8 +760,8 @@ export default class CLI {
               }
               await play(audio);
             }
-            
-            if ( options.copy ){
+
+            if (options.copy) {
               clipboardy.writeSync(output);
               console.log(chalk.gray("[Response copied to clipboard]"));
             }
