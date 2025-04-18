@@ -16,7 +16,6 @@ import {
   displayPatternInfo,
   OllamaError,
   selfUpdate,
-  srtToJSON,
 } from "../common/utils.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import chalk from 'chalk';
@@ -37,6 +36,7 @@ import yoctoSpinner from 'yocto-spinner';
 import matter from 'gray-matter';
 // PLUGINS:
 import mountUnmount from "../plugins/mount/index.js"
+import srt2json from "../plugins/srt2json/index.js"
 
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
@@ -218,13 +218,7 @@ export default class CLI {
   async execute({ options, program, stdin }) {
 
     if (options.srt2json) {
-      const srtFilePath = path.resolve(options.srt2json);
-      // const srtFileName = path.basename(srtFilePath);
-      // const srtFileDir = path.dirname(srtFilePath);
-      const srtFileContent = await fs.readFile(srtFilePath, "utf8");
-      const srtArray = srtToJSON(srtFileContent);
-      process.stdout.write(JSON.stringify(srtArray, null, 2)); // Do not use console.log as it truncates long objects.
-      return;
+      return srt2json({ options, instance: this });
     }
 
     if (options.lambda) {
