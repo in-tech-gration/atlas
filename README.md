@@ -27,7 +27,7 @@ Check out the [Introducing Fabric — A Human AI Augmentation Framework](https:/
   - `npm link`
   - `atlas --setup`
 
-## AVAILABLE OPTIONS
+## AVAILABLE OPTIONS & FEATURES
 
   - `-p, --pattern <pattern...>`
   - `-t, --temperature [temperature]`
@@ -35,7 +35,11 @@ Check out the [Introducing Fabric — A Human AI Augmentation Framework](https:/
   - `-m, --model [model]`
     - Running `-m` or `--model` without any parameters, will display the currently selected model and provider.
 
+  **Check [FEATURES.md](./FEATURES.md) for features.**
+
   More to come...
+
+  Suggest a feature through our [Discussion forum](https://github.com/in-tech-gration/atlas/discussions/categories/ideas) or by opening an [Issue](https://github.com/in-tech-gration/atlas/issues) or a Pull Request.
 
 ## DIFFERENCE FROM `fabric`
 
@@ -44,6 +48,8 @@ Check out the [Introducing Fabric — A Human AI Augmentation Framework](https:/
   `-v, --variable=` for Values for pattern variables, e.g. `-v=#role:expert -v=#points:30"`
 
   Atlas uses `-v, --version` for displaying the software version.
+
+  Also, Atlas goes beyond AI and packs a lot of useful utilities that do not depend on Language Models. 
 
 ## EXAMPLES:
 
