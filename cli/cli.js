@@ -37,6 +37,7 @@ import matter from 'gray-matter';
 // PLUGINS:
 import mountUnmount from "../plugins/mount/index.js"
 import srt2json from "../plugins/srt2json/index.js"
+import YouTube from "../plugins/tools/youtube/youtube.js"
 
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
@@ -80,6 +81,15 @@ export default class CLI {
       .option('--verbose', 'Verbose output (when available)')
       .option('--srt2json <file>', 'Convert SRT file to JSON')
       .option('--mount <state>', 'Mount/unmount one or more drives: --mount on|off|set (MacOS)')
+      .option('-y, --youtube <url>', 'YouTube video URL to grab transcript')
+      // TODO: Implement all fabric options:
+      // -y, --youtube=                    YouTube video or play list "URL" to grab transcript, comments from it and send to chat or print it put to the console and store it in the output file
+      // --playlist                    Prefer playlist over video if both ids are present in the URL
+      // --transcript                  Grab transcript from YouTube video and send to chat (it is used per default).
+      // --transcript-with-timestamps  Grab transcript from YouTube video with timestamps and send to chat
+      // --comments                    Grab comments from YouTube video and send to chat
+      // --metadata                    Output video metadata
+
       // TODO:
       // -s, --stream               Stream
       // -L, --listmodels           List all available models
@@ -565,6 +575,10 @@ export default class CLI {
     // PLUGIN: Mount/Unmount selected drives (Mac OS)
     if (options.mount) {
       return mountUnmount({ options, instance: this });
+    }
+
+    if (options.youtube) {
+      return YouTube({ options, instance: this });
     }
 
     // WiP
