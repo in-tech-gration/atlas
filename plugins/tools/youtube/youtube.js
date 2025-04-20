@@ -1,4 +1,5 @@
 import { YoutubeLoader } from "@langchain/community/document_loaders/web/youtube";
+import { Innertube } from "youtubei.js";
 
 export default async function YouTube({ options, instance }) {
 
@@ -11,7 +12,7 @@ export default async function YouTube({ options, instance }) {
 
     // Silencing stderr due to a bug in the Youtube API
     // See: https://github.com/LuanRT/YouTube.js/blob/main/docs/updating-the-parser.md
-    process.stderr.write = () => {};
+    process.stderr.write = () => { };
 
     const docs = await loader.load();
     // docs.metadata.source|description|title|view_count|author

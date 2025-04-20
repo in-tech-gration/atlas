@@ -9,7 +9,6 @@ import { ChatAnthropic } from "@langchain/anthropic";
 import { TogetherAI } from "@langchain/community/llms/togetherai";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatGroq } from "@langchain/groq";
-import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
 import {
   getOllamaModels,
   listPatterns,
@@ -38,6 +37,7 @@ import matter from 'gray-matter';
 import mountUnmount from "../plugins/mount/index.js"
 import srt2json from "../plugins/srt2json/index.js"
 import YouTube from "../plugins/tools/youtube/youtube.js"
+import web from "../plugins/web/index.js"
 
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
@@ -527,49 +527,8 @@ export default class CLI {
 
     if (options.web) {
 
-      if (typeof options.web === "boolean") {
-        return console.log("Missing search context. Please provide some text to search the web.")
-      }
+      return web({ options, instance: this });
 
-      let tavilyTool;
-
-      try {
-
-        tavilyTool = new TavilySearchResults({
-          maxResults: 3,
-        });
-
-      } catch (error) {
-
-        console.log(chalk.redBright("Error:", error.message));
-
-        if (error.message.includes("No Tavily API key found")) {
-          console.log(`Run ${chalk.blue("atlas -S")} to set up your API keys.`);
-        }
-
-        return;
-
-      }
-
-      const searchResults = await tavilyTool.invoke({
-        input: options.web,
-      });
-
-      const searchResultsJSON = JSON.parse(searchResults);
-
-      let output = `Here are some search results while searching the web for "${options.web}":`
-
-      searchResultsJSON.forEach((result, index) => {
-        output += `\n\n`;
-        output += `## Search result #${index}:\n\n`;
-        output += `Title: ${result.title}\n`;
-        output += `URL: ${result.url}\n`;
-        output += `Content: ${result.content}`;
-      });
-
-      console.log(output);
-
-      return;
     }
 
     // PLUGIN: Mount/Unmount selected drives (Mac OS)

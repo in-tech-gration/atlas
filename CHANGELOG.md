@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Moved `srt2json` to the plugins
+- Moved `--web` to the plugins
 
 ## [0.1.57] - 18/04/2025
 
