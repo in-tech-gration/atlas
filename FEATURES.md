@@ -18,4 +18,4 @@
 
   `atlas --srt2json documentary.srt > documentary.json`
 
-  ![](./assets/atlas-srt2json.gif)
+  <!-- ![](./assets/atlas-srt2json.gif) -->
