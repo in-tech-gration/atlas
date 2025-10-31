@@ -737,6 +737,7 @@ export default class CLI {
 
             // Handle case where Ollama might not be running locally:
             const isChatOllama = this.chatModel instanceof ChatOllama;
+            // TODO: Move LLM-related code to the llm module:
             if (error.message === "fetch failed" && isChatOllama) {
 
               console.log(chalk.redBright("[ ERROR:LLM:INIT ]"), `Error trying to initialize ${chalk.bold(this.model)} model. \nPlease make sure that Ollama is running ${chalk.italic(`('ollama run ${this.model}')`)} and that the model is available.`);
@@ -747,7 +748,15 @@ export default class CLI {
 
             } else {
 
-              console.log(chalk.redBright("ERROR:", error));
+              // console.log(this.chatModel); 
+              if (this.chatModel instanceof ChatAnthropic) {
+
+                console.log(chalk.redBright("ERROR (ChatAntropic):", error.error.error.message));
+
+              // GENERIC
+              } else {
+                console.log(chalk.redBright("ERROR:", error));
+              }
 
             }
 
