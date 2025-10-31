@@ -606,7 +606,9 @@ export default class CLI {
 
     if (options.pattern) {
 
-      const [pattern, data] = options.pattern;
+      let [pattern, ...data] = options.pattern;
+      if ( Array.isArray(data) ) data = data.join(" ");
+      // console.log({ pattern, data });
 
       if (!data && !stdin) {
         return console.log("Please provide some content.");
