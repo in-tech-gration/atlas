@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import os from "node:os";;
+import { glob } from 'node:fs/promises';
 import { Command, Option } from "commander";
 import { ChatOllama } from "@langchain/ollama";
 import { ChatOpenAI } from "@langchain/openai";
@@ -82,6 +83,7 @@ export default class CLI {
       .option('--srt2json <file>', 'Convert SRT file to JSON')
       .option('--mount <state>', 'Mount/unmount one or more drives: --mount on|off|set (MacOS)')
       .option('-y, --youtube <url>', 'YouTube video URL to grab transcript')
+      .option('-u, --use [plugin...]', 'Use plugin')
       // TODO: Implement all fabric options:
       // -y, --youtube=                    YouTube video or play list "URL" to grab transcript, comments from it and send to chat or print it put to the console and store it in the output file
       // --playlist                    Prefer playlist over video if both ids are present in the URL
@@ -540,6 +542,43 @@ export default class CLI {
       return YouTube({ options, instance: this });
     }
 
+    if (options.use) {
+
+      // Display available plugins: /plugins/**/*.plugin.js
+      if (typeof options.use === "boolean") {
+
+        const pluginsPath = path.join(__dirname, "..", "plugins", "**", `*.plugin.js`);
+
+        console.log("==================");
+        console.log("AVAILABLE PLUGINS:");
+        console.log("==================");
+        for await (const entry of glob(pluginsPath)) {
+          const parentDir = path.basename(path.dirname(entry));
+          const pluginName = path.parse(path.basename(entry)).name.split(".plugin")[0];
+          console.log(`${parentDir}::${pluginName}`);
+        }
+        console.log("==================");
+
+        return;
+      }
+
+      const [pluginName, ...pluginOptions] = options.use;
+
+      const safePluginName = pluginName.replaceAll(/([^a-z0-9-_]+)/gi, '');
+      const pluginsPath = path.join(__dirname, "..", "plugins", "**", `${safePluginName}.plugin.js`);
+
+      let hasFoundPlugin = false;
+
+      for await (const entry of glob(pluginsPath)) {
+        const { default: pluginFunction } = await import(entry);
+        await pluginFunction(pluginOptions);
+        hasFoundPlugin = true;
+        break;
+      }
+
+      return hasFoundPlugin ? true : console.log(`Plugin '${pluginName}' could not be found!`);
+    }
+
     // WiP
     // if (options.chat){
     //   return console.log("Chatting...");
@@ -607,7 +646,7 @@ export default class CLI {
     if (options.pattern) {
 
       let [pattern, ...data] = options.pattern;
-      if ( Array.isArray(data) ) data = data.join(" ");
+      if (Array.isArray(data)) data = data.join(" ");
       // console.log({ pattern, data });
 
       if (!data && !stdin) {
@@ -755,7 +794,7 @@ export default class CLI {
 
                 console.log(chalk.redBright("ERROR (ChatAntropic):", error.error.error.message));
 
-              // GENERIC
+                // GENERIC
               } else {
                 console.log(chalk.redBright("ERROR:", error));
               }
