@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.59] - 03/01/2026
+
+- Added `--use` option to execute plugins (files that end with the `.plugin.js` extension)
+- Added `Get Public IP` plugin that has similar effect to `WhatIsMyIP` services. Usage `atlas -u get_public_ip`
+
 ## [0.1.58] - 20/04/2025
 
 ### Added

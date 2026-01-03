@@ -34,6 +34,7 @@ Check out the [Introducing Fabric — A Human AI Augmentation Framework](https:/
   - `-l, --listpatterns`
   - `-m, --model [model]`
     - Running `-m` or `--model` without any parameters, will display the currently selected model and provider.
+  - `-u, --use [plugin] [options]`
 
   **Check [FEATURES.md](./FEATURES.md) for features.**
 
@@ -146,6 +147,7 @@ A technical standards organization responsible for maintaining and developing th
 - [x] Enable ESLint
 - [x] Integrate LLM APIs
 - [x] Implement update functionality
+- [x] Add ability to execute plugin JS files
 - [ ] Port to TypeScript
 - [ ] Introduce Agentic workflows based on LangGraph
 - [ ] Write Unit Tests
@@ -156,6 +158,7 @@ Options:
 - [x] `-p, --pattern              Choose a pattern from the available patterns`
 - [x] `-t, --temperature=         Set temperature (default: 0.7)`
 - [x] `-l, --listpatterns         List all patterns`
+- [x] `-u, --use                  Use plugin`
 - [ ] `-s, --stream               Stream`
 - [ ] `-L, --listmodels           List all available models`
 - [ ] `-o, --output=              Output to file`

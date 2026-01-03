@@ -2,6 +2,12 @@
 
 ## PLUGINS
 
+### Get Public IP (What is my IP?)
+
+  Usage:
+
+  `atlas -u get_public_ip` or `atlas --use get_public_ip`
+
 ### Mount and unmount selected disk drives (MacOS)
 
   Usage: 
