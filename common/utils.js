@@ -53,12 +53,16 @@ export async function displayPatternInfo(pattern) {
   try {
     const patternFileContents = await fs.readFile(primaryPatternsDirSearch, 'utf-8');
     return console.log(patternFileContents);
-  } catch (err) {}
+  } catch (err) {
+    console.log(err);
+  }
 
   try {
     const patternFileContents2 = await fs.readFile(secondaryPatternsDirSearch, 'utf-8');
     return console.log(patternFileContents2);
-  } catch (err) {}
+  } catch (err) {
+    console.log(err);
+  }
 
   console.log(chalk.red.bold("Pattern not found!"));
 
