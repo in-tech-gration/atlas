@@ -1,13 +1,16 @@
 import { YoutubeLoader } from "@langchain/community/document_loaders/web/youtube";
 import { Innertube } from "youtubei.js";
+import chalk from "chalk";
 
 export default async function YouTube({ options, instance }) {
+
+  try {
 
     const url = options.youtube
     // https://js.langchain.com/docs/integrations/document_loaders/web_loaders/youtube/
     const loader = YoutubeLoader.createFromUrl(url, {
-        language: "en",
-        addVideoInfo: false,
+      language: "en",
+      addVideoInfo: false,
     });
 
     // Silencing stderr due to a bug in the Youtube API
@@ -17,4 +20,10 @@ export default async function YouTube({ options, instance }) {
     const docs = await loader.load();
     // docs.metadata.source|description|title|view_count|author
     console.log(docs[0].pageContent);
+
+  } catch (error) {
+
+    console.log(chalk.redBright("Error:", error.message));
+
+  }
 }
