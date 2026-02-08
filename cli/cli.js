@@ -36,7 +36,7 @@ import yoctoSpinner from 'yocto-spinner';
 import matter from 'gray-matter';
 // PLUGINS:
 import mountUnmount from "../plugins/mount/index.js"
-import srt2json from "../plugins/srt2json/srt2json.plugin.js"
+import srt2json from "../plugins/subtitles/srt2json.plugin.js"
 import YouTube from "../plugins/tools/youtube/youtube.js"
 import web from "../plugins/web/index.js"
 
