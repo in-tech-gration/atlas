@@ -36,7 +36,7 @@ import yoctoSpinner from 'yocto-spinner';
 import matter from 'gray-matter';
 // PLUGINS:
 import mountUnmount from "../plugins/mount/index.js"
-import srt2json from "../plugins/srt2json/index.js"
+import srt2json from "../plugins/srt2json/srt2json.plugin.js"
 import YouTube from "../plugins/tools/youtube/youtube.js"
 import web from "../plugins/web/index.js"
 
@@ -562,21 +562,29 @@ export default class CLI {
         return;
       }
 
-      const [pluginName, ...pluginOptions] = options.use;
+      try {
 
-      const safePluginName = pluginName.replaceAll(/([^a-z0-9-_]+)/gi, '');
-      const pluginsPath = path.join(__dirname, "..", "plugins", "**", `${safePluginName}.plugin.js`);
+        const [pluginName, ...pluginOptions] = options.use;
 
-      let hasFoundPlugin = false;
+        const safePluginName = pluginName.replaceAll(/([^a-z0-9-_]+)/gi, '');
+        const pluginsPath = path.join(__dirname, "..", "plugins", "**", `${safePluginName}.plugin.js`);
 
-      for await (const entry of glob(pluginsPath)) {
-        const { default: pluginFunction } = await import(entry);
-        await pluginFunction(pluginOptions);
-        hasFoundPlugin = true;
-        break;
+        let hasFoundPlugin = false;
+
+        for await (const entry of glob(pluginsPath)) {
+          const { default: pluginFunction } = await import(entry);
+          await pluginFunction(pluginOptions);
+          hasFoundPlugin = true;
+          break;
+        }
+
+        return hasFoundPlugin ? true : console.log(`Plugin '${pluginName}' could not be found!`);
+      } catch (error) {
+
+        console.log("ERROR::options.use", error);
+
       }
 
-      return hasFoundPlugin ? true : console.log(`Plugin '${pluginName}' could not be found!`);
     }
 
     // WiP

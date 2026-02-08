@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6] - xx/01/2026
+
+  - Added `-u/--use authy`
+  - Added `-u/--use exiftool`
+  - Added `-u/--use qrcode <IMAGE_FILENAME>`
+  - `srt2json` can now be accessed via the `-u srt2json` option as well
+
 ## [0.1.59] - 03/01/2026
 
 - Added `--use` option to execute plugins (files that end with the `.plugin.js` extension)
