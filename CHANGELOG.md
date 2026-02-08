@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `-u/--use authy`
   - Added `-u/--use exiftool`
   - Added `-u/--use qrcode <IMAGE_FILENAME>`
+  - Added `-u/--use srt2txt <SRT_FILENAME>` option for converting `.srt` subtitle files into plain text files.
   - `srt2json` can now be accessed via the `-u srt2json` option as well
 
 ## [0.1.59] - 03/01/2026
