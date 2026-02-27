@@ -45,3 +45,44 @@ function checkExifTool() {
     return false;
   }
 }
+
+export default function exifTool(options) {
+
+  const filename = options[0];
+
+  try {
+
+    if (!filename) {
+      console.error('Error: Please provide a file path as an argument');
+      console.error('Usage: atlas -u exiftool <file-path>');
+      process.exit(1);
+    }
+
+    // Check if the file exists
+    if (!fs.existsSync(filename)) {
+      console.error(`Error: File not found: ${filename}`);
+      process.exit(1);
+    }
+
+    // Check if it's a file (not a directory)
+    if (!fs.statSync(filename).isFile()) {
+      console.error(`Error: Path is not a file: ${filename}`);
+      process.exit(1);
+    }
+
+    // Check if exiftool is installed
+    const isExifToolInstalled = checkExifTool();
+
+    if (!isExifToolInstalled) {
+      console.log('\nPlease install exiftool and try again.');
+      process.exit(1);
+    }
+
+    // Scan the file metadata
+    scanMetadata(filename);
+
+  } catch (error) {
+    console.log({ error });
+  }
+
+}
