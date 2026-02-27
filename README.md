@@ -152,6 +152,7 @@ A technical standards organization responsible for maintaining and developing th
 - [ ] Introduce Agentic workflows based on LangGraph
 - [ ] Write Unit Tests
 - [ ] Add Chat mode
+- [ ] Add support for cross-platform Desktop notifications
 
 Options:
 

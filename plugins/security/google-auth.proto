@@ -1,0 +1,38 @@
+syntax = "proto2";
+
+message MigrationPayload {
+  repeated OTPParameters otp_parameters = 1;
+  optional int32 version = 2;
+  optional int32 batch_size = 3;
+  optional int32 batch_index = 4;
+  optional int32 batch_id = 5;
+}
+
+message OTPParameters {
+  optional bytes secret = 1;
+  optional string name = 2;
+  optional string issuer = 3;
+  optional Algorithm algorithm = 4;
+  optional DigitCount digits = 5;
+  optional OTPType type = 6;
+  optional int64 counter = 7;
+}
+
+enum Algorithm {
+  ALGORITHM_UNSPECIFIED = 0;
+  ALGORITHM_SHA1 = 1;
+  ALGORITHM_SHA256 = 2;
+  ALGORITHM_SHA512 = 3;
+}
+
+enum DigitCount {
+  DIGIT_COUNT_UNSPECIFIED = 0;
+  DIGIT_COUNT_SIX = 1;
+  DIGIT_COUNT_EIGHT = 2;
+}
+
+enum OTPType {
+  OTP_TYPE_UNSPECIFIED = 0;
+  OTP_TYPE_HOTP = 1;
+  OTP_TYPE_TOTP = 2;
+}
