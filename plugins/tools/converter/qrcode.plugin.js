@@ -13,8 +13,11 @@ export default async function qrCodeScanner() {
   const image = await Jimp.read(buffer);
   
   const qr = new QrCode();
-  qr.callback = (err, value) => {
-    if (err) throw err;
+  qr.callback = (error, value) => {
+    if (error) {
+      console.log( "ERROR::QRCode: " + error );
+      return console.log("¯\\(ツ)/¯ ");
+    };
     console.log("QR decoded:", value.result);
   };
   
