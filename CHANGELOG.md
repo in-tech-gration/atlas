@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.6] - __/02/2026
 
+  - Added `-u/--use img <FILTER> <IMAGE_FILENAME>`
   - Added `-u/--use authy`
   - Added `-u/--use exiftool`
   - Added `-u/--use qrcode <IMAGE_FILENAME>`

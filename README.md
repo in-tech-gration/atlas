@@ -148,6 +148,8 @@ A technical standards organization responsible for maintaining and developing th
 - [x] Integrate LLM APIs
 - [x] Implement update functionality
 - [x] Add ability to execute plugin JS files
+- [x] Add ability to scan QR codes from image files
+- [x] Add ability to manipulate image files
 - [ ] Port to TypeScript
 - [ ] Introduce Agentic workflows based on LangGraph
 - [ ] Write Unit Tests

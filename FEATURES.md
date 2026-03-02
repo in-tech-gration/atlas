@@ -2,6 +2,25 @@
 
 ## PLUGINS
 
+  Type: `atlas -u` to see a list of available plugins.
+
+### Scan QR Code from Image
+
+  Usage:
+
+  `atlas -u qrcode image_with_qrcode.png`;
+
+### Manipulate Images
+
+  Usage: `atlas -u img <filter> <image_filename>`
+
+  `atlas -u img` => See available filters
+
+  `atlas -u img sharpen cat.jpg` => Saves to `cat.sharpened.jpg`
+  `atlas -u img scale=2 dog.png` => Saves to `dog.scaled.png`
+  `atlas -u img upscale cat.jpg` => Saves to `cat.upscaled.jpg`
+  `atlas -u img downscale cat.jpg` => Saves to `cat.downscaled.jpg`
+
 ### Get Public IP (What is my IP?)
 
   Usage:
