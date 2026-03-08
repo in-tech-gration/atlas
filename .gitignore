@@ -136,3 +136,4 @@ dist
 .pnp.*
 
 __IDEAS/
+.vscode/bookmarks.json
