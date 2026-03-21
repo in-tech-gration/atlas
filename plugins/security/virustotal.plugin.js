@@ -58,6 +58,7 @@ export default async function virusTotal(options) {
       const form = new FormData();
       form.append("file", new Blob([fileBuffer]), filePath);
 
+      // https://docs.virustotal.com/reference/files-scan
       const uploadResponse = await fetch('https://www.virustotal.com/api/v3/files', {
         method: 'POST',
         headers: {
@@ -87,7 +88,7 @@ export default async function virusTotal(options) {
       // }
 
       console.log(chalk.gray(`File uploaded successfully. Analysis ID: ${analysisId}`));
-      console.log(chalk.gray(`You can view the analysis results at: https://www.virustotal.com/gui/file/${analysisId}/detection`));
+      // console.log(chalk.gray(`You can view the analysis results at: https://www.virustotal.com/gui/file/${analysisId}/detection`));
 
       const response = await fetch(uploadResult.data.links.self, {
         headers: {
@@ -95,6 +96,7 @@ export default async function virusTotal(options) {
         }
       });
       const finalReport = await response.json();
+      console.log(`Status: ${finalReport.data.attributes.status}`)
       // {
       //   data: {
       //     id: '<ID>',
@@ -119,19 +121,22 @@ export default async function virusTotal(options) {
       //     }
       //   }
       // }
-      console.log(finalReport);
+      // console.log(finalReport);
+      const analysisResponse = await fetch(finalReport.data.links.item, {
+        headers: {
+          'x-apikey': API_KEY,
+        }
+      });
+      const analysisReport = await analysisResponse.json();
+      displayReportResults(analysisReport);
 
     } else {
 
       console.log(chalk.blue(`File found in VirusTotal.`));
       console.log(chalk.blue(`Analysis results: https://www.virustotal.com/gui/file/${report.data.id}/detection`));
       console.log("\nTotal Votes:");
-      Object.entries(report.data.attributes.total_votes).forEach(([engine, result]) => {
-        const color = result === 0 ? chalk.green : chalk.red;
-        console.log(color(`${engine}: ${result === 0 ? result : result}`));
-      });
-      console.log("\nLast Analysis Stats:");
-      console.table(report.data.attributes.last_analysis_stats);
+      displayReportResults(report);
+
     }
 
   } catch (error) {
@@ -141,5 +146,16 @@ export default async function virusTotal(options) {
     process.exit(1);
 
   }
+
+}
+
+function displayReportResults(report) {
+
+  Object.entries(report.data.attributes.total_votes).forEach(([engine, result]) => {
+    const color = result === 0 ? chalk.green : chalk.red;
+    console.log(color(`${engine}: ${result === 0 ? result : result}`));
+  });
+  console.log("\nLast Analysis Stats:");
+  console.table(report.data.attributes.last_analysis_stats);
 
 }
