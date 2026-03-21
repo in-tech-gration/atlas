@@ -1,0 +1,99 @@
+import chalk from 'chalk';
+import fs from 'node:fs';
+import { getFileHash } from "../../common/utils";
+
+const API_KEY = "API_KEY";
+
+/**
+ * @description Scan file(s) with VirusTotal API
+ * @param path file or files
+ */
+export default async function virusTotal(options) {
+
+  // const __dirname = import.meta.dirname;
+  const filePath = options[0];
+
+  try {
+
+    console.log(chalk.gray(`Scanning file: ${filePath} with VirusTotal API...`));
+
+    // Check if the file or directory exists
+    if (!fs.existsSync(filePath)) {
+      console.error(chalk.red(`Error: File or directory not found: ${filePath}`));
+      process.exit(1);
+    }
+
+    const fileHash = getFileHash(filePath);
+
+    const response = await fetch(`https://www.virustotal.com/api/v3/files/${fileHash}`, {
+      headers: {
+        'x-apikey': API_KEY
+      }
+    });
+    const report = await response.json();
+
+    // report.error => { code: 'NotFoundError', message: `File "<HASH>" not found` };
+    if (report.error) {
+
+      console.error(chalk.red(`Error: ${report.error.message}`));
+      console.log(`File not found in VirusTotal. You can upload it for analysis at: https://www.virustotal.com/gui/home/upload`);
+
+      // Check if it's a file or directory
+      // const isDirectory = fs.statSync(path).isDirectory();    
+      // if (isDirectory) {
+      //   console.error(chalk.red(`Error: Path is a directory. Please provide a file path: ${path}`));
+      //   process.exit(1);
+      // }
+
+      // Check if the file is larger than 32MB
+      const fileSizeInBytes = fs.statSyncc(filePath).size;
+      const maxFileSizeInBytes = 32 * 1024 * 1024; // 32MB
+      if (fileSizeInBytes > maxFileSizeInBytes) {
+        console.error(chalk.red(`Error: File size exceeds 32MB limit: ${filePath}`));
+        process.exit(1);
+      }
+
+      const fileBuffer = fs.readFileSync(filePath);
+      const form = new FormData();
+      form.append("file", new Blob([fileBuffer]), filePath);
+
+      const uploadResponse = await fetch('https://www.virustotal.com/api/v3/files', {
+        method: 'POST',
+        headers: {
+          'x-apikey': API_KEY
+        },
+        body: form,
+
+      });
+
+      if (!uploadResponse.ok) {
+        console.log(uploadResponse);
+        console.error(chalk.red(`Error uploading file to VirusTotal: ${uploadResponse.statusText}`));
+        process.exit(1);
+      }
+
+      const uploadResult = await uploadResponse.json();
+      const analysisId = uploadResult.data.id;
+      console.log(uploadResult);
+      console.log(chalk.gray(`File uploaded successfully. Analysis ID: ${analysisId}`));
+      console.log(chalk.gray(`You can view the analysis results at: https://www.virustotal.com/gui/file/${analysisId}/detection`));
+
+    } else {
+
+      console.log(chalk.blue(`File found in VirusTotal.`));
+      console.log(chalk.blue(`Analysis results: https://www.virustotal.com/gui/file/${report.data.id}/detection`));
+      console.log("\nTotal Votes:");
+      Object.entries(report.data.attributes.total_votes).forEach(([engine, result]) => {
+        const color = result === 0 ? chalk.green : chalk.red;
+        console.log(color(`${engine}: ${result === 0 ? result : result}`));
+      });
+      console.log("\nLast Analysis Stats:");
+      console.table(report.data.attributes.last_analysis_stats);
+    }
+
+  } catch (error) {
+    console.error(chalk.red(`Error scanning file with VirusTotal: ${error.message}`));
+    process.exit(1);
+  }
+
+}
