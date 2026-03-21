@@ -96,7 +96,10 @@ export default async function virusTotal(options) {
         }
       });
       const finalReport = await response.json();
-      console.log(`Status: ${finalReport.data.attributes.status}`)
+      
+      // "completed" | "queued"
+      console.log(`Status: ${finalReport.data.attributes.status}`) 
+      
       // {
       //   data: {
       //     id: '<ID>',
@@ -122,6 +125,11 @@ export default async function virusTotal(options) {
       //   }
       // }
       // console.log(finalReport);
+      if ( finalReport.data.attributes.status === "queued" ){
+        return console.log("Ongoing analysis. Report is queued. Please try in a moment.");
+      }
+      // console.log(finalReport);
+
       const analysisResponse = await fetch(finalReport.data.links.item, {
         headers: {
           'x-apikey': API_KEY,
