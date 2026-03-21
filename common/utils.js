@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path, { dirname } from "node:path";
+import crypto from 'node:crypto';
 import chalk from 'chalk';
 import { ATLAS_PATTERNS_DIR, PATTERNS_DIR } from "./config.js";
 import { fileURLToPath } from "url";
@@ -65,6 +66,13 @@ export async function displayPatternInfo(pattern) {
   }
 
   console.log(chalk.red.bold("Pattern not found!"));
+
+}
+
+export function getFileHash(filePath, algorithm = 'sha256') {
+
+  const fileBuffer = fs.readFileSync(filePath);
+  return crypto.createHash(algorithm).update(fileBuffer).digest('hex');
 
 }
 

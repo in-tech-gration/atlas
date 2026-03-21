@@ -549,15 +549,15 @@ export default class CLI {
 
         const pluginsPath = path.join(__dirname, "..", "plugins", "**", `*.plugin.js`);
 
-        console.log("==================");
-        console.log("AVAILABLE PLUGINS:");
-        console.log("==================");
+        console.log(chalk.yellow("=================="));
+        console.log(chalk.yellow("AVAILABLE PLUGINS:"));
+        console.log(chalk.yellow("=================="));
         for await (const entry of glob(pluginsPath)) {
           const parentDir = path.basename(path.dirname(entry));
           const pluginName = path.parse(path.basename(entry)).name.split(".plugin")[0];
-          console.log(`${parentDir}::${pluginName}`);
+          console.log(chalk.cyan(`${parentDir}::`) + `${pluginName}`);
         }
-        console.log("==================");
+        console.log(chalk.yellow("=================="));
 
         return;
       }
