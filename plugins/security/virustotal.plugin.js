@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import fs from 'node:fs';
-import { getFileHash } from "../../common/utils";
+import { getFileHash } from "../../common/utils.js";
 
 const API_KEY = "API_KEY";
 
@@ -33,10 +33,11 @@ export default async function virusTotal(options) {
     const report = await response.json();
 
     // report.error => { code: 'NotFoundError', message: `File "<HASH>" not found` };
-    if (report.error) {
+    if (report.error && report.error.code === "NotFoundError" ) {
 
       console.error(chalk.red(`Error: ${report.error.message}`));
-      console.log(`File not found in VirusTotal. You can upload it for analysis at: https://www.virustotal.com/gui/home/upload`);
+      // console.log(`File not found in VirusTotal. You can upload it for analysis at: https://www.virustotal.com/gui/home/upload`);
+      console.log(`File not found in VirusTotal. Uploading for check...`);
 
       // Check if it's a file or directory
       // const isDirectory = fs.statSync(path).isDirectory();    
@@ -46,7 +47,7 @@ export default async function virusTotal(options) {
       // }
 
       // Check if the file is larger than 32MB
-      const fileSizeInBytes = fs.statSyncc(filePath).size;
+      const fileSizeInBytes = fs.statSync(filePath).size;
       const maxFileSizeInBytes = 32 * 1024 * 1024; // 32MB
       if (fileSizeInBytes > maxFileSizeInBytes) {
         console.error(chalk.red(`Error: File size exceeds 32MB limit: ${filePath}`));
@@ -92,8 +93,11 @@ export default async function virusTotal(options) {
     }
 
   } catch (error) {
+
+    // console.log(error);
     console.error(chalk.red(`Error scanning file with VirusTotal: ${error.message}`));
     process.exit(1);
+
   }
 
 }

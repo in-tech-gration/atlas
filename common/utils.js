@@ -69,9 +69,9 @@ export async function displayPatternInfo(pattern) {
 
 }
 
-export function getFileHash(filePath, algorithm = 'sha256') {
+export async function getFileHash(filePath, algorithm = 'sha256') {
 
-  const fileBuffer = fs.readFileSync(filePath);
+  const fileBuffer = await fs.readFile(filePath);
   return crypto.createHash(algorithm).update(fileBuffer).digest('hex');
 
 }
