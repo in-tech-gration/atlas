@@ -33,7 +33,7 @@ export default async function virusTotal(options) {
     const report = await response.json();
 
     // report.error => { code: 'NotFoundError', message: `File "<HASH>" not found` };
-    if (report.error && report.error.code === "NotFoundError" ) {
+    if (report.error && report.error.code === "NotFoundError") {
 
       console.error(chalk.red(`Error: ${report.error.message}`));
       // console.log(`File not found in VirusTotal. You can upload it for analysis at: https://www.virustotal.com/gui/home/upload`);
@@ -75,9 +75,51 @@ export default async function virusTotal(options) {
 
       const uploadResult = await uploadResponse.json();
       const analysisId = uploadResult.data.id;
-      console.log(uploadResult);
+      // console.log(uploadResult);
+      // {
+      //   data: {
+      //     type: 'analysis',
+      //     id: '<ID>',
+      //     links: {
+      //       self: 'https://www.virustotal.com/api/v3/analyses/ID'
+      //     }
+      //   }
+      // }
+
       console.log(chalk.gray(`File uploaded successfully. Analysis ID: ${analysisId}`));
       console.log(chalk.gray(`You can view the analysis results at: https://www.virustotal.com/gui/file/${analysisId}/detection`));
+
+      const response = await fetch(uploadResult.data.links.self, {
+        headers: {
+          'x-apikey': API_KEY,
+        }
+      });
+      const finalReport = await response.json();
+      // {
+      //   data: {
+      //     id: '<ID>',
+      //       type: 'analysis',
+      //         links: {
+      //       self: 'https://www.virustotal.com/api/v3/analyses/<ID>',
+      //         item: 'https://www.virustotal.com/api/v3/files/<HASH>'
+      //     },
+      //     attributes: {
+      //       date: 1774111544,
+      //         status: 'completed',
+      //           results: [Object],
+      //             stats: [Object]
+      //     }
+      //   },
+      //   meta: {
+      //     file_info: {
+      //       sha256: '<HASH>',
+      //         md5: '<MD5>',
+      //           sha1: '<SHA1>',
+      //             size: 8521
+      //     }
+      //   }
+      // }
+      console.log(finalReport);
 
     } else {
 
