@@ -23,7 +23,7 @@ export default async function virusTotal(options) {
       process.exit(1);
     }
 
-    const fileHash = getFileHash(filePath);
+    const fileHash = await getFileHash(filePath);
 
     const response = await fetch(`https://www.virustotal.com/api/v3/files/${fileHash}`, {
       headers: {
