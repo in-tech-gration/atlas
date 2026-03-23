@@ -159,11 +159,16 @@ export default async function virusTotal(options) {
 
 function displayReportResults(report) {
 
-  Object.entries(report.data.attributes.total_votes).forEach(([engine, result]) => {
+  const { attributes } = report.data;
+
+  Object.entries(attributes.total_votes).forEach(([engine, result]) => {
     const color = result === 0 ? chalk.green : chalk.red;
     console.log(color(`${engine}: ${result === 0 ? result : result}`));
   });
+  console.log(`Meaningful Name: ${attributes.meaningful_name}`);
+  console.table(attributes.names);
+  
   console.log("\nLast Analysis Stats:");
-  console.table(report.data.attributes.last_analysis_stats);
+  console.table(attributes.last_analysis_stats);
 
 }
