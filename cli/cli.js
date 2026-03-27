@@ -50,8 +50,24 @@ process.on("uncaughtException", (error) => {
   process.exit(1);
 });
 
+/**
+ * @typedef ConfigStore
+ * @type {object}
+ * @property {string} path 
+ * @property {any} all 
+ * @property {number} size 
+ * @property {{(key: string) => any}} get 
+ * @property {{(key: string, val: any) => void}} set
+ * @property {{(values: any) => void}} set
+ * @property {{(key: string) => boolean}} has
+ * @property {{(key: string) => void}} delete
+ * @property {{() => void}} clear
+ */
 export default class CLI {
 
+  /**
+   * @param {{version: string, config: ConfigStore }} myObj description
+   */
   constructor({ version, config }) {
     this.version = version;
     this.config = config;
