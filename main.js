@@ -11,8 +11,10 @@ const packageJson = JSON.parse(
 const config = new Configstore(packageJson.name, {});
 // Other candidate: https://github.com/cosmiconfig/cosmiconfig
 
-const atlas = new CLI({
+const cliConfig = {
   version: packageJson.version,
   config,
-});
+}
+
+const atlas = new CLI(cliConfig);
 atlas.init();
