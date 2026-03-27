@@ -48,3 +48,12 @@
   `atlas -u srt2json documentary.srt > documentary.json`
 
   <!-- ![](./assets/atlas-srt2json.gif) -->
+
+## DEVELOPMENT
+
+  **Features:**
+
+  - Uses [JSDoc](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html) for type checking and definitions
+
+  - Uses [`configstore`](https://www.npmjs.com/package/configstore) npm package for storing API keys.
+
