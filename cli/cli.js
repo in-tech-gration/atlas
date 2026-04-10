@@ -120,6 +120,11 @@ export default class CLI {
       .addOption(new Option('--play [play]', 'Play your favorite music').hideHelp())
       .addOption(new Option('--describe <file>', 'Describe an image file').hideHelp())
       .addOption(new Option('--lambda <lambda_name>', 'Parse input through a lambda function').hideHelp())
+      .configureOutput({
+        writeErr(error){
+          console.log(error);
+        }
+      });
 
     program.addHelpText('before', chalk.green.bold(`[[ Welcome to atlas v${this.version} ]]`));
 
