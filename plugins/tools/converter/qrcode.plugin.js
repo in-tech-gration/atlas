@@ -1,6 +1,8 @@
 import { Jimp } from "jimp";
 import QrCode from "qrcode-reader";
 import fs from "node:fs";
+import path from "node:path";
+import chalk from "chalk";
 
 export default async function qrCodeScanner() {
   
@@ -9,6 +11,12 @@ export default async function qrCodeScanner() {
     process.exit();
   }
   const filename = process.argv[4];
+  const fileExtension = path.extname(filename);
+  
+  if ( fileExtension === ".webp" ){
+    return console.log(chalk.red("ERROR: Webp image file format is not supported. Try converting to PNG."));
+  }
+  
   const buffer = await fs.promises.readFile(filename);
   const image = await Jimp.read(buffer);
   
