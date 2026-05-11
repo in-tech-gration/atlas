@@ -36,6 +36,7 @@
     "configstore": "^7.0.0",
     "dotenv": "^16.4.7",
     "elevenlabs": "^1.55.0",
+    "fuse.js": "^7.3.0",
     "gray-matter": "^4.0.3",
     "hi-base32": "^0.5.1",
     "jimp": "^1.6.0",

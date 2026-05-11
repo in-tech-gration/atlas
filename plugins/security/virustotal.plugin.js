@@ -8,7 +8,7 @@ const API_KEY = "API_KEY";
  * @description Scan file(s) with VirusTotal API
  * @param path file or files
  */
-export default async function virusTotal(options) {
+export default async function virusTotal(options, globalOptions) {
 
   // const __dirname = import.meta.dirname;
   const filePath = options[0];
@@ -96,10 +96,10 @@ export default async function virusTotal(options) {
         }
       });
       const finalReport = await response.json();
-      
+
       // "completed" | "queued"
-      console.log(`Status: ${finalReport.data.attributes.status}`) 
-      
+      console.log(`Status: ${finalReport.data.attributes.status}`)
+
       // {
       //   data: {
       //     id: '<ID>',
@@ -125,7 +125,7 @@ export default async function virusTotal(options) {
       //   }
       // }
       // console.log(finalReport);
-      if ( finalReport.data.attributes.status === "queued" ){
+      if (finalReport.data.attributes.status === "queued") {
         return console.log("Ongoing analysis. Report is queued. Please try in a moment.");
       }
       // console.log(finalReport);
@@ -140,10 +140,22 @@ export default async function virusTotal(options) {
 
     } else {
 
-      console.log(chalk.blue(`File found in VirusTotal.`));
-      console.log(chalk.blue(`Analysis results: https://www.virustotal.com/gui/file/${report.data.id}/detection`));
-      console.log("\nTotal Votes:");
-      displayReportResults(report);
+      const hasResults = Object.keys(report.data.attribute.last_analysis_results).length > 0;
+
+      if (hasResults) {
+
+        console.log(chalk.blue(`File found in VirusTotal.`));
+        console.log(chalk.blue(`Analysis results: https://www.virustotal.com/gui/file/${report.data.id}/detection`));
+        console.log("\nTotal Votes:");
+
+        displayReportResults(report);
+
+      } else {
+
+        console.log(chalk.yellow(`Analysis not ready. Please try again in a few seconds.`));
+        console.log(chalk.blue(`Analysis page: https://www.virustotal.com/gui/file/${report.data.id}/detection`));
+
+      }
 
     }
 
@@ -151,6 +163,9 @@ export default async function virusTotal(options) {
 
     // console.log(error);
     console.error(chalk.red(`Error scanning file with VirusTotal: ${error.message}`));
+    if (globalOptions.verbose) {
+      console.log(error);
+    }
     process.exit(1);
 
   }
@@ -167,7 +182,7 @@ function displayReportResults(report) {
   });
   console.log(`Meaningful Name: ${attributes.meaningful_name}`);
   console.table(attributes.names);
-  
+
   console.log("\nLast Analysis Stats:");
   console.table(attributes.last_analysis_stats);
 

@@ -86,6 +86,7 @@ export default class CLI {
       .option("-v, --version", "Display version") // Overrides fabric option
       // .option("--calendar", "Experimental calendar feature") // WiP
       // .option('--chat', 'Start a chat session') // WiP
+      .option("--ask <question...>", "Query the local knowledge database")
       .option('-p, --pattern <pattern...>', 'Choose a pattern from the available patterns')
       .option('-t, --temperature [temperature]', 'Set temperature (default: 0.7)')
       .option('-m, --model [model]', 'Choose model (or show currently selected model [without parameters')
@@ -121,7 +122,7 @@ export default class CLI {
       .addOption(new Option('--describe <file>', 'Describe an image file').hideHelp())
       .addOption(new Option('--lambda <lambda_name>', 'Parse input through a lambda function').hideHelp())
       .configureOutput({
-        writeErr(error){
+        writeErr(error) {
           console.log(error);
         }
       });
@@ -252,6 +253,14 @@ export default class CLI {
 
     if (options.srt2json) {
       return srt2json({ options, instance: this });
+    }
+
+    if (options.ask) {
+
+      const module = await import("../core/database.js");
+      const askDatabase = module.default;
+      return askDatabase(options);
+
     }
 
     if (options.lambda) {
@@ -594,7 +603,8 @@ export default class CLI {
 
         for await (const entry of glob(pluginsPath)) {
           const { default: pluginFunction } = await import(entry);
-          await pluginFunction(pluginOptions);
+          const globalOptions = options;
+          await pluginFunction(pluginOptions, globalOptions);
           hasFoundPlugin = true;
           break;
         }
