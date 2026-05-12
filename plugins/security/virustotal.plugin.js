@@ -140,7 +140,7 @@ export default async function virusTotal(options, globalOptions) {
 
     } else {
 
-      const hasResults = Object.keys(report.data.attribute.last_analysis_results).length > 0;
+      const hasResults = Object.keys(report.data.attributes.last_analysis_results).length > 0;
 
       if (hasResults) {
 
