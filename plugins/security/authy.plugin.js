@@ -10,21 +10,6 @@ import base32 from "hi-base32";
 // How to extract secret key from Exported Authenticator code (QRCode):
 // atlas -u authy otpauth-migration://offline?data=...%3D
 
-// NodeApp:
-const amazonSecretKey = "";
-const githubSecretKey = "";
-const googleSecretKey = "";
-const protonSecretKey = "";
-const slackSecretKey  = "";
-
-const providersSecrets = {
-  amazon: amazonSecretKey,
-  github: githubSecretKey,
-  google: googleSecretKey,
-  proton: protonSecretKey,
-  slack: slackSecretKey,
-}
-
 // GitHub: Extraction of Secret from Exported data:
 async function extractGoogleAuthenticatorSecret(migrationUrl) {
 
@@ -67,9 +52,17 @@ async function extractGoogleAuthenticatorSecret(migrationUrl) {
 
 }
 
-export default async function authy(options) {
+export default async function authy(options, globalOptions, cliInstance) {
 
+  const providersJSON = cliInstance.config.get('authenticator');
+
+  if ( !providersJSON ){
+    return console.log("ERROR: Authenticator providers configuration not found.");
+  }
+  
   const providers = [];
+  const providersObject = JSON.parse(providersJSON);
+  const { providersSecrets } = providersObject;
   const defaultProviders = Object.keys(providersSecrets);
 
   if (options.length > 0) {
