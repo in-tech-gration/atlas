@@ -602,14 +602,22 @@ export default class CLI {
         let hasFoundPlugin = false;
 
         for await (const entry of glob(pluginsPath)) {
+
           const { default: pluginFunction } = await import(entry);
           const globalOptions = options;
-          await pluginFunction(pluginOptions, globalOptions);
+          const cliInstance = this;
+          await pluginFunction(
+            pluginOptions, 
+            globalOptions, 
+            cliInstance
+          );
           hasFoundPlugin = true;
           break;
+
         }
 
         return hasFoundPlugin ? true : console.log(`Plugin '${pluginName}' could not be found!`);
+
       } catch (error) {
 
         console.log("ERROR::options.use", error);
