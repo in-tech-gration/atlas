@@ -5,13 +5,14 @@ import pluginJs from "@eslint/js";
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   {
-    languageOptions: { globals: {...globals.browser, ...globals.node} }
+    languageOptions: { globals: { ...globals.browser, ...globals.node } }
   },
   pluginJs.configs.recommended,
   {
     rules: {
       "no-unused-vars": "warn",
-      "no-unreachable": "off"
+      "no-unused-labels": "off",
+      "no-unreachable": "off",
     },
   }
 ];
