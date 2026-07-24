@@ -149,30 +149,34 @@ class CaptionTimeSpanValidator {
       return this.result;
     }
 
-    const { start, end } = this.content.currentSubtitleObject.time;
-    const { sequenceNumber } = this.content.currentSubtitleObject;
+    return this.content.forEach((sub, index, subs) => {
+      const { sequenceNumber, time: { start, end } } = sub;
 
-    if (start >= end) {
-      throw new ParseError(
-        'start time should be less than end time',
-        null,
-        ErrorCode.VALIDATOR_ERROR_START_TIME,
-        sequenceNumber,
-      );
-    }
-
-    if (this.content.lastSubtitleObject.sequenceNumber) {
-      const { sequenceNumber: prevSequenceNumber } = this.content.lastSubtitleObject;
-      const { start: prevStart, end: prevEnd } = this.content.lastSubtitleObject.time;
-      if (prevEnd > start) {
+      if (start >= end) {
         throw new ParseError(
-          'start time should be less than previous end time',
+          `start time ${start} should be less than end time ${end}`,
           null,
-          ErrorCode.VALIDATOR_ERROR_END_TIME,
-          prevSequenceNumber,
-        )
+          ErrorCode.VALIDATOR_ERROR_START_TIME,
+          sequenceNumber,
+        );
       }
-    }
+
+      if (index > 0) {
+
+        const { time: { end: prevEnd } } = subs[index - 1];
+
+        if (prevEnd > start) {
+          throw new ParseError(
+            `start time ${start} should be less than previous end time ${prevEnd}`,
+            null,
+            ErrorCode.VALIDATOR_ERROR_END_TIME,
+            sequenceNumber,
+          )
+        }
+      }
+
+
+    })
 
   }
 }
@@ -187,19 +191,13 @@ function parse(file) {
   const lines = file.trim().split(EOL);
   const result = [];
   let lastSequenceNumber = null;
-  let lastSubtitleObject = {};
 
   for (let i = 0; i < lines.length; i += 1) {
 
     const lineNumbers = { chunkStart: i, timeSpan: i, text: i, chunkEnd: i };
 
-    // Will be used for comparison with current subtitle and caption time span check:
-    const lastSubtitleObjectClone = structuredClone(lastSubtitleObject);
-
     // First line
     const sequenceNumber = parseSequenceNumber(lines[i], i);
-
-    lastSubtitleObject.sequenceNumber = sequenceNumber;
 
     if (sequenceNumber > 1 && lastSequenceNumber + 1 !== sequenceNumber) {
       throw new ParseError(
@@ -213,7 +211,6 @@ function parse(file) {
     i += 1;
     lineNumbers.timeSpan = i;
     const time = parseTimeSpan(lines[i], i);
-    lastSubtitleObject.time = time;
 
     i += 1;
     lineNumbers.text = i;
@@ -234,16 +231,6 @@ function parse(file) {
     lineNumbers.chunkEnd = i - 1;
 
     lastSequenceNumber = sequenceNumber;
-
-    // CAPTION TIME SPAN VALIDATION:
-    const ctsValidator = new CaptionTimeSpanValidator({
-      currentSubtitleObject: {
-        time,
-        sequenceNumber,
-      },
-      lastSubtitleObject: lastSubtitleObjectClone,
-    });
-    ctsValidator.validate();
 
     result.push({
       lineNumbers,
@@ -270,6 +257,11 @@ export default async function srtVerify(options, globalOptions, cli) {
     const data = await fs.readFile(srtFile, 'utf8');
 
     const parsed = parse(data);
+
+    // CAPTION TIME SPAN VALIDATION:
+    const ctsValidator = new CaptionTimeSpanValidator(parsed);
+    ctsValidator.validate();
+
     console.log("All good! SRT file successfully verified.");
 
   } catch (err) {
