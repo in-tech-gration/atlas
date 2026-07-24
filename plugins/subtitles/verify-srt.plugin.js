@@ -141,6 +141,7 @@ class CaptionTimeSpanValidator {
 
   constructor(content) {
     this.content = content;
+    this.report = [];
   }
 
   validate() {
@@ -149,16 +150,17 @@ class CaptionTimeSpanValidator {
       return this.result;
     }
 
-    return this.content.forEach((sub, index, subs) => {
+    this.content.forEach((sub, index, subs) => {
+      
       const { sequenceNumber, time: { start, end } } = sub;
 
       if (start >= end) {
-        throw new ParseError(
-          `start time ${start} should be less than end time ${end}`,
-          null,
-          ErrorCode.VALIDATOR_ERROR_START_TIME,
-          sequenceNumber,
-        );
+        this.report.push({
+          message: `start time ${start} should be less than end time ${end}`,
+          lineNumber: null,
+          errorCode: ErrorCode.VALIDATOR_ERROR_START_TIME,
+          sequenceNumber
+        });
       }
 
       if (index > 0) {
@@ -166,17 +168,19 @@ class CaptionTimeSpanValidator {
         const { time: { end: prevEnd } } = subs[index - 1];
 
         if (prevEnd > start) {
-          throw new ParseError(
-            `start time ${start} should be less than previous end time ${prevEnd}`,
-            null,
-            ErrorCode.VALIDATOR_ERROR_END_TIME,
-            sequenceNumber,
-          )
+          this.report.push({
+            message: `start time ${start} should be less than previous end time ${prevEnd}`,
+            lineNumber: null,
+            errorCode: ErrorCode.VALIDATOR_ERROR_END_TIME,
+            sequenceNumber: sequenceNumber,
+          });
         }
       }
 
 
-    })
+    });
+
+    return this.report;
 
   }
 }
@@ -260,8 +264,10 @@ export default async function srtVerify(options, globalOptions, cli) {
 
     // CAPTION TIME SPAN VALIDATION:
     const ctsValidator = new CaptionTimeSpanValidator(parsed);
-    ctsValidator.validate();
-
+    const ctsValidationReport = ctsValidator.validate();
+    if (ctsValidationReport.length > 0) {
+      throw new Error(JSON.stringify(ctsValidationReport, null, "\t"));
+    }
     console.log("All good! SRT file successfully verified.");
 
   } catch (err) {
