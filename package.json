@@ -9,7 +9,7 @@
   },
   "scripts": {
     "postinstall": "echo 'Installed Atlas CLI!'",
-    "test": "jest"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "jest": {
     "testPathIgnorePatterns": ["<rootDir>/lambdas/common/test.js"]
