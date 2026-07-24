@@ -6,6 +6,8 @@ import chalk from 'chalk';
  */
 export default async function whisper(options, globalOptions, cliInstance) {
 
+  return console.log("Work in progress...");
+
   const execConfig = { encoding: 'utf8', timeout: 5000 };
   // ⚠️ TESTING via Llamafile:
   const whisperPath = "~/Applications/whisper-tiny.en.llamafile";

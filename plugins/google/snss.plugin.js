@@ -7,6 +7,8 @@ import fs from "fs";
  */
 export default function snssParser() {
 
+  return console.log("Work in progress...");
+
   class PickleReader {
 
     constructor(buffer) {
