@@ -131,7 +131,9 @@ function parseTimeSpan(timeSpan, lineNumber) {
   }
 
   return {
-    start: parseTimeStamp(start, lineNumber),
+    rawStart: start, // Raw format: 00:00:03,880
+    rawEnd: end,
+    start: parseTimeStamp(start, lineNumber), // Parsed format: 3880
     end: parseTimeStamp(end, lineNumber),
   };
 }
