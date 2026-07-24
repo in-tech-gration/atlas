@@ -8,7 +8,11 @@
     "atlas": "main.js"
   },
   "scripts": {
-    "postinstall": "echo 'Installed Atlas CLI!'"
+    "postinstall": "echo 'Installed Atlas CLI!'",
+    "test": "jest"
+  },
+  "jest": {
+    "testPathIgnorePatterns": ["<rootDir>/lambdas/common/test.js"]
   },
   "repository": {
     "type": "git",
@@ -40,10 +44,14 @@
     "gray-matter": "^4.0.3",
     "hi-base32": "^0.5.1",
     "jimp": "^1.6.0",
+    "jsdom": "28.0.0",
+    "marked": "18.0.2",
+    "node-notifier": "^10.0.1",
     "prompts": "^2.4.2",
     "protobufjs": "^8.0.0",
     "qrcode-reader": "^1.0.4",
     "speakeasy": "^2.0.0",
+    "turndown": "7.2.4",
     "xml2js": "^0.6.2",
     "yocto-spinner": "^0.2.1",
     "youtubei.js": "^16.0.1"
@@ -51,6 +59,7 @@
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "eslint": "^9.22.0",
-    "globals": "^16.0.0"
+    "globals": "^16.0.0",
+    "jest": "^30.4.2"
   }
 }
