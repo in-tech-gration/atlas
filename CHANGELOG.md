@@ -5,8 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.6] - __/02/2026
+## [0.1.61] - 24/07/2026
 
+### Updated
+
+- Updated verify-srt with caption time span check
+
+## [0.1.6] - 23/07/2026
+
+  - Added `-u/--use verify-srt <SRT_FILENAME>` for verifying `.srt` subtitle files
   - Added `-u/--use img <FILTER> <IMAGE_FILENAME>`
   - Added `-u/--use authy`
   - Added `-u/--use exiftool`

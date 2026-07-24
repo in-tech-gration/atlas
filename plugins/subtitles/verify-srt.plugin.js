@@ -16,11 +16,14 @@ const ErrorCode = {
 }
 
 class ParseError extends Error {
-  constructor(message, lineNumber, errorCode) {
+
+  constructor(message, lineNumber, errorCode, sequenceNumber) {
     super(message);
-    this.lineNumber = lineNumber + 1; // lineNumber is 0-indexed
+    this.lineNumber = lineNumber ? lineNumber + 1 : ""; // lineNumber is 0-indexed
     this.errorCode = errorCode;
+    this.sequenceNumber = sequenceNumber;
   }
+
 }
 
 const toMS = {
@@ -133,6 +136,47 @@ function parseTimeSpan(timeSpan, lineNumber) {
   };
 }
 
+// SOURCE: https://github.com/taoning2014/srt-validator/blob/main/src/validators/caption-time-span-validator.ts
+class CaptionTimeSpanValidator {
+
+  constructor(content) {
+    this.content = content;
+  }
+
+  validate() {
+
+    if (!this.content) {
+      return this.result;
+    }
+
+    const { start, end } = this.content.currentSubtitleObject.time;
+    const { sequenceNumber } = this.content.currentSubtitleObject;
+
+    if (start >= end) {
+      throw new ParseError(
+        'start time should be less than end time',
+        null,
+        ErrorCode.VALIDATOR_ERROR_START_TIME,
+        sequenceNumber,
+      );
+    }
+
+    if (this.content.lastSubtitleObject.sequenceNumber) {
+      const { sequenceNumber: prevSequenceNumber } = this.content.lastSubtitleObject;
+      const { start: prevStart, end: prevEnd } = this.content.lastSubtitleObject.time;
+      if (prevEnd > start) {
+        throw new ParseError(
+          'start time should be less than previous end time',
+          null,
+          ErrorCode.VALIDATOR_ERROR_END_TIME,
+          prevSequenceNumber,
+        )
+      }
+    }
+
+  }
+}
+
 /**
  * Parses a given SRT file contents
  * @param  {String} file - Contents of an SRT file in the string format
@@ -141,16 +185,22 @@ function parseTimeSpan(timeSpan, lineNumber) {
 function parse(file) {
 
   const lines = file.trim().split(EOL);
-
   const result = [];
   let lastSequenceNumber = null;
+  let lastSubtitleObject = {};
 
   for (let i = 0; i < lines.length; i += 1) {
 
     const lineNumbers = { chunkStart: i, timeSpan: i, text: i, chunkEnd: i };
 
+    // Will be used for comparison with current subtitle and caption time span check:
+    const lastSubtitleObjectClone = structuredClone(lastSubtitleObject);
+
     // First line
     const sequenceNumber = parseSequenceNumber(lines[i], i);
+
+    lastSubtitleObject.sequenceNumber = sequenceNumber;
+
     if (sequenceNumber > 1 && lastSequenceNumber + 1 !== sequenceNumber) {
       throw new ParseError(
         `Invalid sequence number increment: ${sequenceNumber}`,
@@ -163,9 +213,7 @@ function parse(file) {
     i += 1;
     lineNumbers.timeSpan = i;
     const time = parseTimeSpan(lines[i], i);
-
-    // Text can span multiple lines, so consume all lines
-    // until the separator
+    lastSubtitleObject.time = time;
 
     i += 1;
     lineNumbers.text = i;
@@ -186,6 +234,16 @@ function parse(file) {
     lineNumbers.chunkEnd = i - 1;
 
     lastSequenceNumber = sequenceNumber;
+
+    // CAPTION TIME SPAN VALIDATION:
+    const ctsValidator = new CaptionTimeSpanValidator({
+      currentSubtitleObject: {
+        time,
+        sequenceNumber,
+      },
+      lastSubtitleObject: lastSubtitleObjectClone,
+    });
+    ctsValidator.validate();
 
     result.push({
       lineNumbers,

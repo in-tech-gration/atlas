@@ -4,8 +4,19 @@ import fs from "node:fs";
 import path from "node:path";
 import chalk from "chalk";
 
-export default async function qrCodeScanner() {
+const GENERATE = "generate";
+
+export default async function qrCodeScanner(options, globalOptions) {
   
+
+  if ( options[0] === GENERATE && options[1] ){
+
+    const textToBeEncoded = options[1];
+    // WORK IN PROGRESS...
+    return console.log(`Generating QR Code for: ${textToBeEncoded}`);
+
+  }
+
   if (process.argv.length < 5) {
     console.log("Missing filename.");
     process.exit();
@@ -17,19 +28,31 @@ export default async function qrCodeScanner() {
     return console.log(chalk.red("ERROR: Webp image file format is not supported. Try converting to PNG."));
   }
   
-  const buffer = await fs.promises.readFile(filename);
-  const image = await Jimp.read(buffer);
-  
-  const qr = new QrCode();
-  qr.callback = (error, value) => {
-    if (error) {
-      console.log( "ERROR::QRCode: " + error );
-      return console.log("¯\\(ツ)/¯ ");
+  try {
+    
+    const buffer = await fs.promises.readFile(filename);
+    const image = await Jimp.read(buffer);
+    
+    const qr = new QrCode();
+    qr.callback = (error, value) => {
+      if (error) {
+        console.log( "ERROR::QRCode: " + error );
+        return console.log("¯\\(ツ)/¯ ");
+      };
+      console.log("QR decoded:", value.result);
     };
-    console.log("QR decoded:", value.result);
-  };
-  
-  qr.decode(image.bitmap);
+    
+    qr.decode(image.bitmap);
+
+  } catch (error) {
+
+    if ( globalOptions.verbose ){
+      console.log(error.stack);
+    } else {
+      console.log(`ERROR: ${error.message}`);
+    }
+
+  }
   
 }
 // Alternatives:
