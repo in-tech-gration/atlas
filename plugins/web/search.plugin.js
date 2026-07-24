@@ -19,7 +19,7 @@ export default async function search(options, globalOptions, cliInstance) {
     });
     rl.question(`Please enter your SERP API KEY: `, key => {
       cliInstance.config.set("serp_api_key", key);
-      console.log(`Key stored: ${key}. Please run the search command again.`);
+      console.log(`Key stored. Please run the search command again.`);
       rl.close();
     });
 

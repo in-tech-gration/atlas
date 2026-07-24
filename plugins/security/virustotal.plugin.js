@@ -1,14 +1,33 @@
 import chalk from 'chalk';
 import fs from 'node:fs';
 import { getFileHash } from "../../common/utils.js";
-
-const API_KEY = "API_KEY";
+import readline from 'node:readline';
 
 /**
+ * ⚠️ WORK IN PROGRESS
  * @description Scan file(s) with VirusTotal API
  * @param path file or files
  */
-export default async function virusTotal(options, globalOptions) {
+export default async function virusTotal(options, globalOptions, cliInstance) {
+
+  const API_KEY = cliInstance.config.get('virustotal_api_key');
+
+  if (!API_KEY) {
+
+    console.log("ERROR: Missing VirusTotal API Key");
+
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+    rl.question(`Please enter your VirusTotal API KEY: `, key => {
+      cliInstance.config.set("virustotal_api_key", key);
+      console.log(`Key stored. Please run the search command again.`);
+      rl.close();
+    });
+
+    return;
+  }
 
   // const __dirname = import.meta.dirname;
   const filePath = options[0];
