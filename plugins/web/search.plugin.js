@@ -1,9 +1,30 @@
 import querystring from "node:querystring";
+import readline from 'node:readline';
 
-const API_KEY = "API_KEY";
+/**
+ * ⚠️ WORK IN PROGRESS
+ * @description: Uses: Serp API (https://www.npmjs.com/package/serpapi)
+ */
+export default async function search(options, globalOptions, cliInstance) {
 
-// Uses: Serp API (https://www.npmjs.com/package/serpapi)
-export default async function search(options) {
+  const API_KEY = cliInstance.config.get('serp_api_key');
+
+  if (!API_KEY) {
+
+    console.log("ERROR: Missing SERP API Key");
+
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+    rl.question(`Please enter your SERP API KEY: `, key => {
+      cliInstance.config.set("serp_api_key", key);
+      console.log(`Key stored: ${key}. Please run the search command again.`);
+      rl.close();
+    });
+
+    return;
+  }
 
   if (options.length === 0) {
     return console.log("Missing search term");
@@ -27,6 +48,11 @@ export default async function search(options) {
     });
     const response = await fetch(`https://serpapi.com/search?${query}`);
     const json = await response.json();
+
+    if (json.error) {
+      throw new Error(json.error);
+    }
+
     const organicResults = json["organic_results"];
     const sources = new Set();
 
