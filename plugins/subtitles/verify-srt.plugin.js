@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 
 // BASED ON: https://github.com/taoning2014/srt-validator
 
-const ErrorCode = {
+export const ErrorCode = {
   PARSER_ERROR_MISSING_TEXT: 'parserErrorMissingText',
   PARSER_ERROR_MISSING_SEQUENCE_NUMBER: 'parserErrorMissingSequenceNumber',
   PARSER_ERROR_INVALID_SEQUENCE_NUMBER: 'parserErrorInvalidSequenceNumber',
@@ -139,7 +139,7 @@ function parseTimeSpan(timeSpan, lineNumber) {
 }
 
 // SOURCE: https://github.com/taoning2014/srt-validator/blob/main/src/validators/caption-time-span-validator.ts
-class CaptionTimeSpanValidator {
+export class CaptionTimeSpanValidator {
 
   constructor(content) {
     this.content = content;
@@ -153,7 +153,7 @@ class CaptionTimeSpanValidator {
     }
 
     this.content.forEach((sub, index, subs) => {
-      
+
       const { sequenceNumber, time: { start, end } } = sub;
 
       if (start >= end) {
@@ -192,7 +192,7 @@ class CaptionTimeSpanValidator {
  * @param  {String} file - Contents of an SRT file in the string format
  * @return {Array} - A list of subtitle metadata
  */
-function parse(file) {
+export function parse(file) {
 
   const lines = file.trim().split(EOL);
   const result = [];
