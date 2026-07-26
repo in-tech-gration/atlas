@@ -130,7 +130,7 @@ export async function getOllamaModels() {
               name: `${model}:${version}`
             })
           } else {
-            models.push({ 
+            models.push({
               name: `${folder}/${model}:${version}`
             });
           }
@@ -185,7 +185,7 @@ export function selfUpdate() {
  * @link Based on: https://github.com/npm/node-which and https://github.com/isaacs/isexe
  * @description Usage: which.sync("ollama"); await which("ollama");
  */
-export const which = (function initWhich(){
+export const which = (function initWhich() {
 
   // posix.js
   /**
@@ -195,7 +195,7 @@ export const which = (function initWhich(){
    * @module
    */
   const posix = {
-  
+
     /**
      * Determine whether a path is executable according to the mode and
      * current (or specified) user and group IDs.
@@ -217,7 +217,7 @@ export const which = (function initWhich(){
      * the mode and current (or specified) user and group IDs.
      */
     sync(path, options = {}) {
-  
+
       const { ignoreErrors = false } = options;
       try {
         const fileStatus = statSync(path);
@@ -231,7 +231,7 @@ export const which = (function initWhich(){
         throw er;
       }
     },
-  
+
     checkStat(stat, options) {
       try {
         const isFile = stat.isFile();
@@ -241,7 +241,7 @@ export const which = (function initWhich(){
         console.log(error);
       }
     },
-  
+
     checkMode(stat, options) {
       const myUid = options.uid ?? process.getuid?.();
       const myGroups = options.groups ?? process.getgroups?.() ?? [];
@@ -262,9 +262,9 @@ export const which = (function initWhich(){
         (mod & u && uid === myUid) ||
         (mod & ug && myUid === 0));
     }
-  
+
   }
-  
+
   // win32.js
   /**
    * This is the Windows implementation of isexe, which uses the file
@@ -273,7 +273,7 @@ export const which = (function initWhich(){
    * @module
    */
   const win32 = {
-  
+
     /**
      * Determine whether a path is executable based on the file extension
      * and PATHEXT environment variable (or specified pathExt option)
@@ -306,7 +306,7 @@ export const which = (function initWhich(){
         throw er;
       }
     },
-  
+
     checkPathExt(path, options) {
       const { pathExt = process.env.PATHEXT || '' } = options;
       const peSplit = pathExt.split(delimiter);
@@ -322,13 +322,13 @@ export const which = (function initWhich(){
       }
       return false;
     },
-  
+
     checkStat(stat, path, options) {
       return stat.isFile() && this.checkPathExt(path, options);
     }
-  
+
   }
-  
+
   // isexe/index.js
   // import * as posix from './posix.js';
   // import * as win32 from './win32.js';
@@ -336,9 +336,8 @@ export const which = (function initWhich(){
   // export { win32, posix };
   const platform = process.env._ISEXE_TEST_PLATFORM_ || process.platform;
   const impl = platform === 'win32' ? win32 : posix;
-  
   const isWindows = process.platform === 'win32'
-  
+
   // used to check for slashed in commands passed in. always checks for the posix
   // seperator on all platforms, and checks for the current separator when not on
   // a posix platform. don't use the isWindows check for this since that is mocked
@@ -347,17 +346,22 @@ export const which = (function initWhich(){
   /* istanbul ignore next */
   const rSlash = new RegExp(`[${posix.sep}${sep === posix.sep ? '' : sep}]`.replace(/(\\)/g, '\\$1'))
   const rRel = new RegExp(`^\\.${rSlash.source}`)
-  
-  const getNotFoundError = (cmd) => {
-    return Object.assign(new Error(`not found: ${cmd}`), { code: 'ENOENT' })
+
+  class GetNotFoundError extends Error {
+
+    constructor(message) {
+      super(message);
+      this.name = "GetNotFoundError";
+    }
+
   }
-  
+
   const getPathInfo = (cmd, {
     path: optPath = process.env.PATH,
     pathExt: optPathExt = process.env.PATHEXT,
     delimiter: optDelimiter = delimiter,
   }) => {
-  
+
     // If it has a slash, then we don't bother searching the pathenv.
     // just check the file itself, and that's it.
     const matchRSlash = null;
@@ -367,7 +371,7 @@ export const which = (function initWhich(){
       ...(isWindows ? [process.cwd()] : []),
       ...(optPath || /* istanbul ignore next: very unusual */ '').split(optDelimiter),
     ]
-  
+
     if (isWindows) {
       const pathExtExe = optPathExt ||
         ['.EXE', '.CMD', '.BAT', '.COM'].join(optDelimiter)
@@ -377,24 +381,24 @@ export const which = (function initWhich(){
       }
       return { pathEnv, pathExt, pathExtExe }
     }
-  
+
     return { pathEnv, pathExt: [''] }
   }
-  
+
   const getPathPart = (raw, cmd) => {
     const pathPart = /^".*"$/.test(raw) ? raw.slice(1, -1) : raw
     const prefix = !pathPart && rRel.test(cmd) ? cmd.slice(0, 2) : ''
     return prefix + join(pathPart, cmd)
   }
-  
+
   const which = async (cmd, opt = {}) => {
 
     const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt)
     const found = []
-  
+
     for (const envPart of pathEnv) {
       const p = getPathPart(envPart, cmd)
-  
+
       for (const ext of pathExt) {
         const withExt = p + ext
         /**
@@ -409,36 +413,37 @@ export const which = (function initWhich(){
         }
       }
     }
-  
+
     if (opt.all && found.length) {
       return found
     }
-  
+
     if (opt.nothrow) {
       return null
     }
-  
-    throw getNotFoundError(cmd)
+
+    throw new GetNotFoundError(cmd);
+
   }
-  
+
   const whichSync = (cmd, opt = {}) => {
-  
+
     const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt)
     const found = []
-  
+
     for (const pathEnvPart of pathEnv) {
-  
+
       const pathPart = getPathPart(pathEnvPart, cmd);
-  
+
       for (const ext of pathExt) {
-  
+
         const withExt = pathPart + ext
         /**
          * Synchronously determine whether a path is executable on the
          * current platform.
          */
         const is = impl.sync(withExt, { pathExt: pathExtExe, ignoreErrors: true })
-  
+
         if (is) {
           if (!opt.all) {
             return withExt
@@ -447,20 +452,21 @@ export const which = (function initWhich(){
         }
       }
     }
-  
+
     if (opt.all && found.length) {
       return found
     }
-  
+
     if (opt.nothrow) {
       return null
     }
-  
-    throw getNotFoundError(cmd)
+
+    throw new GetNotFoundError(cmd);
   }
-  
+
   which.sync = whichSync;
+  which.GetNotFoundError = GetNotFoundError;
 
   return which;
-  
+
 }());

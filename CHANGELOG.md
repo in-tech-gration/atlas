@@ -11,10 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `fix-srt` plugin for fixing overlapping automatic YouTube subtitles
 - Add `which` utility function to check for existence of commands and CLI tools
+- Add `exiftool` utility for checking file metadata
 
 ### Updated
 
-- Updated verify-srt with caption time span check
+- Updated `verify-srt` with caption time span check
 
 ## [0.1.6] - 23/07/2026
 
