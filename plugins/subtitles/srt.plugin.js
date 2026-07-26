@@ -135,15 +135,26 @@ function shiftSrtTiming(inputFilePath, outputFilePath, shiftSeconds, overwrite =
 /**
  * ⚠️ WORK IN PROGRESS...
  */
-export default async function srt(options) {
+export default async function srt(options, globalOptions, cliInstance) {
+
+  if (!options[0] || options[0] === "help") {
+    if (options[1]) {
+      console.log("Time Shifting usage:");
+      console.log("atlas -u srt <INPUT_FILE> <TIME_SHIFT> [OUTPUT_FILE]");
+      console.log("Example:");
+      console.log("atlas -u srt brazil.srt shift=-8.5 brazil.synced.srt");
+      return;
+    }
+    console.log("Here are the available plugin options:");
+    return console.log("- Time Shifting (type `help ts` for more)");
+  }
 
   const srtFile = options[0];
-  const secs = -8.5;
-  const outputFile = "";
+  const shift = options[1].split("=")[1];
+  const parsedSrtFilename = path.parse(srtFile);
+  const outputFile = options[2] || `${parsedSrtFilename.dir}${path.sep}${parsedSrtFilename.name}.synced${parsedSrtFilename.ext}`;
   const overwriteFlag = false;
-  // console.log({ srtFile });
-
-  const shiftSeconds = parseFloat(secs);
+  const shiftSeconds = parseFloat(shift);
   // const overwriteFlag = args.includes('--overwrite');
 
   try {
