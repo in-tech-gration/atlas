@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.61] - 25/07/2026
+## [0.1.61] - 26/07/2026
 
 ### Added
 
 - Add `fix-srt` plugin for fixing overlapping automatic YouTube subtitles
+- Add `which` utility function to check for existence of commands and CLI tools
 
 ### Updated
 
