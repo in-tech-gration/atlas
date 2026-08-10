@@ -4,7 +4,7 @@ import Fuse from "fuse.js";
 import db from "../_db_.json" with { type: "json" };
 import clipboardy from 'clipboardy';
 
-function database({ question, keys = ["question", "tags"] }) {
+function database({ question, keys = ["question", "tags"], useTokenSearch = false }) {
 
   /**
    * @typedef FuseOptions 
@@ -17,30 +17,55 @@ function database({ question, keys = ["question", "tags"] }) {
    * @type {FuseOptions}
    */
   const fuseOptions = {
+    useTokenSearch,
     includeScore: true,
     keys,
   }
 
-  const fuse = new Fuse(db, fuseOptions)
+  const fuse = new Fuse(db, fuseOptions);
   const result = fuse.search(question);
   return result;
 
 }
 
-/**
- * ⚠️ WORK IN PROGRESS
- */
+// ⚠️ WORK IN PROGRESS
 export default function askDatabase(options, globalOptions, cliInstance) {
 
+  /**
+   * @type {string} "simple search string" | "keyword[s]:html", "tag[s]:video,audio"
+   */
   const question = options.ask.join(" ");
-  // const module = await import("../core/database.js");
-  // const database = module.default;
-  // const db = cliInstance.config.get('db.json');
-  const answers = database({ question });
+  let searchType = "generic";
+  let answers = null;
+
+  const matchParam = question.match(/(keyword|tag|answer|author|category)[s]?:\s*(?<value>.*)/i);
+
+  if (matchParam) {
+
+    const type = matchParam[1];
+    const values = matchParam.groups.value.split(",");
+    searchType = type;
+
+    answers = database({
+      question: values.join(" "),
+      keys: ["question"],
+      // TODO: Implement advanced search based on available keys (tags, answer, etc.)
+      // keys: [type === "keyword" ? "question" : type],
+    });
+
+  } else {
+
+    // const module = await import("../core/database.js");
+    // const database = module.default;
+    // const db = cliInstance.config.get('db.json');
+    answers = database({ question });
+
+  }
 
   console.log("=================");
   console.log("Possible matches:");
-  console.log("=================");
+  console.log(chalk.dim(`(Search Type: ${searchType})`));
+  console.log("=================\n");
 
   answers.forEach((answer, index) => {
 
@@ -50,7 +75,7 @@ export default function askDatabase(options, globalOptions, cliInstance) {
     console.log(`Question: ${chalk.yellow(answer.item.question)}`);
     console.log(`Answer: ${chalk.green(answer.item.answer.join(""))}`);
     // console.log(`Score: ${chalk[scoreColor](score + "%")}`);
-    if ( index === 0 ){
+    if (index === 0) {
       console.log(chalk.cyan(`(Answer copied to clipboard)`));
     }
     console.log();
