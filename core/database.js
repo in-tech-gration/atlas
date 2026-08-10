@@ -4,11 +4,21 @@ import Fuse from "fuse.js";
 import db from "../_db_.json" with { type: "json" };
 import clipboardy from 'clipboardy';
 
-function database({ question }) {
+function database({ question, keys = ["question", "tags"] }) {
 
+  /**
+   * @typedef FuseOptions 
+   * @type {object}
+   * @property {boolean} includeScore - Whether to include the score in the search results
+   * @property {Array.<'question'|'tags'|'answer'|'references'|'category'|'author'>} keys  - The keys to search in the database
+   */
+
+  /**
+   * @type {FuseOptions}
+   */
   const fuseOptions = {
     includeScore: true,
-    keys: ['question', 'tags']
+    keys,
   }
 
   const fuse = new Fuse(db, fuseOptions)
