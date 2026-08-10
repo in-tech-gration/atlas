@@ -249,6 +249,12 @@ export default class CLI {
 
   }
 
+  /**
+   * @param {Object} params 
+   * @param {Object} params.options 
+   * @param {*} params.program 
+   * @param {string} params.stdin 
+   */
   async execute({ options, program, stdin }) {
 
     if (options.srt2json) {
