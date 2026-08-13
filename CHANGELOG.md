@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add `wikipedia` plugin
 - Add `fix-srt` plugin for fixing overlapping automatic YouTube subtitles
 - Add `which` utility function to check for existence of commands and CLI tools
 - Add `exiftool` utility for checking file metadata
