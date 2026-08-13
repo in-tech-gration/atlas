@@ -86,7 +86,7 @@ export default class CLI {
       .option("-v, --version", "Display version") // Overrides fabric option
       // .option("--calendar", "Experimental calendar feature") // WiP
       // .option('--chat', 'Start a chat session') // WiP
-      .option("--ask <question...>", "Query the local knowledge database")
+      .option("--ask <question...>", "Query the local knowledge database. Also accepts 'keyword:term1,term2' option")
       .option('-p, --pattern <pattern...>', 'Choose a pattern from the available patterns')
       .option('-t, --temperature [temperature]', 'Set temperature (default: 0.7)')
       .option('-m, --model [model]', 'Choose model (or show currently selected model [without parameters')
