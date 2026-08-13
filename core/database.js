@@ -38,6 +38,21 @@ export default function askDatabase(options, globalOptions, cliInstance) {
   let searchType = "generic";
   let answers = null;
 
+  if (question === "help") {
+
+    console.log();
+    console.log(chalk.yellow("=================="));
+    console.log(chalk.yellow("Available options:"));
+    console.log(chalk.yellow("=================="));
+    console.log("atlas --ask help");
+    console.log("atlas --ask How can I trim an mp3 file?");
+    console.log("atlas --ask keyword:term1,term2");
+    console.log();
+    return;
+
+  }
+
+
   const matchParam = question.match(/(keyword|tag|answer|author|category)[s]?:\s*(?<value>.*)/i);
 
   if (matchParam) {
