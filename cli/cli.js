@@ -310,6 +310,50 @@ export default class CLI {
 
     if (options.setup) {
 
+      const TAVILY_API_KEY = getAPIKey("TAVILY_API_KEY");
+      const TOGETHER_AI_API_KEY = getAPIKey("TOGETHER_AI_API_KEY");
+      const GROQ_API_KEY = getAPIKey("GROQ_API_KEY");
+      const JINA_API_KEY = getAPIKey("JINA_API_KEY");
+      const OPENAI_API_KEY = getAPIKey("OPENAI_API_KEY");
+      const ANTHROPIC_API_KEY = getAPIKey("ANTHROPIC_API_KEY");
+      const GOOGLE_API_KEY = getAPIKey("GOOGLE_API_KEY");
+      const ELEVENLABS_API_KEY = getAPIKey("ELEVENLABS_API_KEY");
+
+      if (options.setup === "show") {
+        let apiKeys = "";
+        if (TAVILY_API_KEY) {
+          apiKeys += `Tavily API key: ${TAVILY_API_KEY}`;
+        }
+        if (TOGETHER_AI_API_KEY) {
+          apiKeys += `\nTogether.AI API key: ${TOGETHER_AI_API_KEY}`;
+        }
+        if (GROQ_API_KEY) {
+          apiKeys += `\nGroq API key: ${GROQ_API_KEY}`;
+        }
+        if (JINA_API_KEY) {
+          apiKeys += `\nJina.AI API key: ${JINA_API_KEY}`;
+        }
+        if (OPENAI_API_KEY) {
+          apiKeys += `\nOpenAI API key: ${OPENAI_API_KEY}`;
+        }
+        if (ANTHROPIC_API_KEY) {
+          apiKeys += `\nAnthropic API key: ${ANTHROPIC_API_KEY}`;
+        }
+        if (GOOGLE_API_KEY) {
+          apiKeys += `\nGoogle API key: ${GOOGLE_API_KEY}`;
+        }
+        if (ELEVENLABS_API_KEY) {
+          apiKeys += `\nEleven Labs API key: ${ELEVENLABS_API_KEY}`;
+        }
+        console.log(chalk.yellow("=================="));
+        console.log(chalk.yellow("AVAILABLE API KEYS"));
+        console.log(chalk.yellow("=================="));
+        console.log(apiKeys);
+        console.log(chalk.yellow("=================="));
+        return;
+      }
+
+
       if (Object.keys(this.config.all).length > 0) {
         // console.log(chalk.gray("Current configuration:"));
         // console.log(chalk.gray(JSON.stringify(this.config.all)));
@@ -336,16 +380,6 @@ export default class CLI {
 
       const currentLlmProvider = this.config.get("llm_provider");
       const currentModel = this.config.get("model");
-
-      const TAVILY_API_KEY = getAPIKey("TAVILY_API_KEY");
-      const TOGETHER_AI_API_KEY = getAPIKey("TOGETHER_AI_API_KEY");
-      const GROQ_API_KEY = getAPIKey("GROQ_API_KEY");
-      const JINA_API_KEY = getAPIKey("JINA_API_KEY");
-      const OPENAI_API_KEY = getAPIKey("OPENAI_API_KEY");
-      const ANTHROPIC_API_KEY = getAPIKey("ANTHROPIC_API_KEY");
-      const GOOGLE_API_KEY = getAPIKey("GOOGLE_API_KEY");
-      const ELEVENLABS_API_KEY = getAPIKey("ELEVENLABS_API_KEY");
-
       const apiPromptType = options.setup === "show" ? "text" : "password";
 
       // https://github.com/terkelg/prompts?tab=readme-ov-file#-types
@@ -613,8 +647,8 @@ export default class CLI {
           const globalOptions = options;
           const cliInstance = this;
           await pluginFunction(
-            pluginOptions, 
-            globalOptions, 
+            pluginOptions,
+            globalOptions,
             cliInstance
           );
           hasFoundPlugin = true;

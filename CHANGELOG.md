@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 
 - Updated `verify-srt` with caption time span check
+- Updated `--setup show, -S show` command
 
 ## [0.1.6] - 23/07/2026
 
