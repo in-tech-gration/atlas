@@ -77,10 +77,10 @@ export default function askDatabase(options, globalOptions, cliInstance) {
 
   }
 
-  console.log("=================");
-  console.log("Possible matches:");
+  console.log("======================");
+  console.log(`Possible matches (${answers.length}):`);
   console.log(chalk.dim(`(Search Type: ${searchType})`));
-  console.log("=================\n");
+  console.log("======================\n");
 
   answers.forEach((answer, index) => {
 
