@@ -89,49 +89,18 @@ func Cli(version string) (err error) {
 		return
 	}
 
-	if currentFlags.ListPatterns {
-		err = fabricDb.Patterns.ListNames()
-		return
-	}
+	// OPTION: ListPatterns -> fabricDb.Patterns.ListNames()
 
-	if currentFlags.ListAllModels {
-		var models *ai.VendorsModels
-		if models, err = registry.VendorManager.GetModels(); err != nil {
-			return
-		}
-		models.Print()
-		return
-	}
+	// OPTION: ListAllModels -> registry.VendorManager.GetModels()
 
-	if currentFlags.ListAllContexts {
-		err = fabricDb.Contexts.ListNames()
-		return
-	}
+	// OPTION: ListAllContexts -> fabricDb.Contexts.ListNames()
+	// OPTION: WipeContext -> fabricDb.Contexts.Delete(currentFlags.WipeContext)
+	// OPTION: PrintContext ->fabricDb.Contexts.PrintContext(currentFlags.PrintContext)
 
-	if currentFlags.ListAllSessions {
-		err = fabricDb.Sessions.ListNames()
-		return
-	}
+	// OPTION: ListAllSessions -> fabricDb.Sessions.ListNames()
+	// OPTION: WipeSession ->fabricDb.Sessions.Delete(currentFlags.WipeSession)
+	// OPTION: PrintSession ->fabricDb.Sessions.PrintSession(currentFlags.PrintSession)
 
-	if currentFlags.WipeContext != "" {
-		err = fabricDb.Contexts.Delete(currentFlags.WipeContext)
-		return
-	}
-
-	if currentFlags.WipeSession != "" {
-		err = fabricDb.Sessions.Delete(currentFlags.WipeSession)
-		return
-	}
-
-	if currentFlags.PrintSession != "" {
-		err = fabricDb.Sessions.PrintSession(currentFlags.PrintSession)
-		return
-	}
-
-	if currentFlags.PrintContext != "" {
-		err = fabricDb.Contexts.PrintContext(currentFlags.PrintContext)
-		return
-	}
 
 	if currentFlags.HtmlReadability {
 		if msg, cleanErr := converter.HtmlReadability(currentFlags.Message); cleanErr != nil {
@@ -141,20 +110,9 @@ func Cli(version string) (err error) {
 		}
 	}
 
-	if currentFlags.ListExtensions {
-		err = registry.TemplateExtensions.ListExtensions()
-		return
-	}
-
-	if currentFlags.AddExtension != "" {
-		err = registry.TemplateExtensions.RegisterExtension(currentFlags.AddExtension)
-		return
-	}
-
-	if currentFlags.RemoveExtension != "" {
-		err = registry.TemplateExtensions.RemoveExtension(currentFlags.RemoveExtension)
-		return
-	}
+	// OPTION: ListExtensions -> registry.TemplateExtensions.ListExtensions()
+	// OPTION: AddExtension -> registry.TemplateExtensions.RegisterExtension(currentFlags.AddExtension)
+	// OPTION: RemoveExtension ->registry.TemplateExtensions.RemoveExtension(currentFlags.RemoveExtension)
 
 	// if the interactive flag is set, run the interactive function
 	// if currentFlags.Interactive {
@@ -266,11 +224,7 @@ func Cli(version string) (err error) {
 	}
 
 	// if the copy flag is set, copy the message to the clipboard
-	if currentFlags.Copy {
-		if err = CopyToClipboard(result); err != nil {
-			return
-		}
-	}
+	// OPTION: Copy  -> CopyToClipboard(result)
 
 	// if the output flag is set, create an output file
 	if currentFlags.Output != "" {
