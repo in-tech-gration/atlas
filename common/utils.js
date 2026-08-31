@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process';
 import { statSync } from 'node:fs'
 import { stat } from 'node:fs/promises';
 import fs from "node:fs/promises";
@@ -178,6 +179,53 @@ export function selfUpdate() {
   // } catch (error) {
   //   console.error('Update failed:', error);
   // }
+
+}
+
+/**
+ * Execute the CLI tool with given arguments
+ * ⚠️ Work in progress...
+ * @param {null} [args] _
+ * @returns {Promise} _
+ */
+function executeTool(args = null) {
+
+  const toolArgs = args || this.defaultArgs;
+
+  try {
+
+    console.log(`🚀 Executing: ${this.toolName} ${toolArgs.join(' ')}\n`);
+
+    // Spawn the process for real-time output
+    const child = spawn(this.toolName, toolArgs, {
+      stdio: 'inherit',
+      shell: this.isWindows
+    });
+
+    return new Promise((resolve, reject) => {
+
+      child.on('close', (code) => {
+        if (code === 0) {
+          console.log(`\n✅ ${this.toolName} completed successfully`);
+          resolve({ success: true, code });
+        } else {
+          console.log(`\n❌ ${this.toolName} exited with code ${code}`);
+          resolve({ success: false, code });
+        }
+      });
+
+      child.on('error', (error) => {
+        console.error(`\n❌ Failed to execute ${this.toolName}:`, error.message);
+        reject(error);
+      });
+    });
+
+  } catch (error) {
+
+    console.error(`❌ Error executing ${this.toolName}:`, error.message);
+    throw error;
+
+  }
 
 }
 
