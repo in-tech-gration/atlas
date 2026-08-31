@@ -117,27 +117,6 @@ cat example.txt | atlas -p explain_terms -t 0
 cat example.txt | atlas --pattern explain_terms --temperature 0
 ```
 
-Output:
-
-```markdown
-## ABSTRACTION LAYER: 
-A layer of the Internet protocol suite that provides a conceptual separation between different network functions and protocols, allowing for classification and organization.
--- Analogy: A library's cataloging system that groups books by genre or author to facilitate searching and retrieval.
--- Why It Matters: The abstraction layers help in understanding how data is communicated over networks and which protocols are involved at each stage.
-
-## DEPARTMENT OF DEFENSE (DoD) MODEL:
-A historical term for the early versions of the Internet protocol suite, as it was initially funded by the United States Department of Defense through DARPA.
--- Analogy: A prototype or beta version of a software that is refined and improved over time to become a standard.
--- Why It Matters: The DoD model highlights the origins and evolution of the Internet protocol suite.
-
-## INTERNET ENGINEERING TASK FORCE (IETF):
-A technical standards organization responsible for maintaining and developing the Internet protocol suite and its constituent protocols.
--- Analogy: A governing body that sets rules and regulations for a particular sport, ensuring consistency and fairness across different leagues.
--- Why It Matters: The IETF ensures the stability and interoperability of the Internet protocol suite.
-
-... (truncated)
-```
-
 ## TODO
 
 - [x] Add changelog
