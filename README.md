@@ -157,3 +157,7 @@ Options:
 <br />
 
 <a href="https://twitter.com/intent/user?screen_name=kostasx">![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/kostasx)</a>
+
+## DEVELOPMENT
+
+See [DEVELOPMENT.md](./DEVELOPMENT.md)
