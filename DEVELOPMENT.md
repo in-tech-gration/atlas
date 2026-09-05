@@ -16,3 +16,12 @@
   }
   ```
 
+## HOW TO | CREATE A PLUGIN
+
+  - Create a file inside the `plugins/` folder. Make sure it has the `.plugin.js` extension and the following structure:
+
+  ```js
+  export default async function pluginName(options, globalOptions, cliInstance) {
+  }
+  ```
+
