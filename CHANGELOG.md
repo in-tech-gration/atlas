@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.61] - 10/08/2026
+## [0.1.61] - 05/09/2026
 
 ### Added
 
@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `exiftool` utility for checking file metadata
 - Add `plist` utility for reading binary plist files on MacOS
 - Enable and configure `eslint-plugin-jsdoc`
+- Add `--youtube, -y` option for downloading YouTube transcripts
 
 ### Updated
 

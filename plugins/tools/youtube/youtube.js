@@ -1,6 +1,4 @@
-import { YoutubeLoader } from "@langchain/community/document_loaders/web/youtube";
-import { Innertube } from "youtubei.js";
-import chalk from "chalk";
+import xml2js from "xml2js";
 
 function getYouTubeVideoIdFromURL(url) {
 
@@ -15,42 +13,86 @@ function getYouTubeVideoIdFromURL(url) {
 
 }
 
+/**
+ * Get captions for a given YouTube video and language (default: English).
+ * Based on: https://medium.com/@aqib-2/extract-youtube-transcripts-using-innertube-api-2025-javascript-guide-dc417b762f49
+ * @param {string} videoId - YouTube video ID
+ * @param {string} language - Language code, e.g., "en", "hi"
+ * @returns {Promise<Array<{ caption: string, startTime: number, endTime: number }>>} _
+ */
+async function getYoutubeTranscript(videoId, language = "en") {
+
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+  // Step 1
+  const html = await fetch(videoUrl).then(res => res.text());
+  const apiKeyMatch = html.match(/"INNERTUBE_API_KEY":"([^"]+)"/);
+  if (!apiKeyMatch) throw new Error("INNERTUBE_API_KEY not found.");
+  const apiKey = apiKeyMatch[1];
+
+  // Step 2
+  const playerData = await fetch(`https://www.youtube.com/youtubei/v1/player?key=${apiKey}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      context: {
+        client: {
+          clientName: "ANDROID",
+          clientVersion: "20.10.38"
+        }
+      },
+      videoId
+    })
+  })
+    .then(res => res.json())
+    .catch(e => console.log(e));
+
+  // Step 3
+  const tracks = playerData?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+  if (!tracks) throw new Error("No captions found.");
+  const track = tracks.find(t => t.languageCode === language);
+  if (!track) throw new Error(`No captions for language: ${language}`);
+
+  const baseUrl = track.baseUrl.replace(/&fmt=\w+$/, "");
+
+  // Step 4
+  const xml = await fetch(baseUrl).then(res => res.text());
+  const json = await xml2js.parseStringPromise(xml);
+  const transcript = json.transcript.text.map(t => {
+    return `${t._} `;
+  }).join("").replaceAll("&#39;", "'");
+
+  return transcript;
+
+}
+
 export default async function YouTube({ options, instance }) {
 
-  const url = options.youtube;
+  /**
+   * @type {string}
+   */
+  const youTubeURLorId = options.youtube;
+
+  if (!youTubeURLorId) {
+    return console.log("Missing YouTube URL or VideoID.");
+  }
+
+  let videoId = youTubeURLorId;
+
+  if (videoId.startsWith("http")) {
+    videoId = getYouTubeVideoIdFromURL(youTubeURLorId);
+  }
 
   try {
 
-    // https://js.langchain.com/docs/integrations/document_loaders/web_loaders/youtube/
-    const loader = YoutubeLoader.createFromUrl(url, {
-      language: "en",
-      addVideoInfo: false,
-    });
-
-    // Silencing stderr due to a bug in the Youtube API
-    // See: https://github.com/LuanRT/YouTube.js/blob/main/docs/updating-the-parser.md
-    process.stderr.write = () => { };
-
-    const docs = await loader.load();
-    // docs.metadata.source|description|title|view_count|author
-    console.log(docs[0].pageContent);
+    const transcript = await getYoutubeTranscript(videoId);
+    console.log(transcript);
 
   } catch (error) {
-
-    // Try the auto-generated subtitles if all else fails:
-    disabled: {
-      break disabled;
-      const videoId = getYouTubeVideoIdFromURL(url);
-      const innertube = await Innertube.create(/* options */);
-      const videoInfo = await innertube.getInfo(videoId);
-      const captions = videoInfo.captions?.caption_tracks ?? [];
-      if (captions.length > 0 && captions[0].kind === "asr") {
-        console.log(captions[0].name); // { text: "English (auto-generated)" }
-        console.log(captions[0].base_url);
-      }
-    }
-
-    console.log(chalk.redBright("Error:", error.message));
+    
+    console.log(error);
 
   }
+
 }
+

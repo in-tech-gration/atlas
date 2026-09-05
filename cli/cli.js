@@ -99,7 +99,7 @@ export default class CLI {
       .option('--verbose', 'Verbose output (when available)')
       .option('--srt2json <file>', 'Convert SRT file to JSON')
       .option('--mount <state>', 'Mount/unmount one or more drives: --mount on|off|set (MacOS)')
-      .option('-y, --youtube <url>', 'YouTube video URL to grab transcript')
+      .option('-y, --youtube <url>', 'YouTube video URL or Video ID to grab transcript')
       .option('-u, --use [plugin...]', 'Use plugin')
       // TODO: Implement all fabric options:
       // -y, --youtube=                    YouTube video or play list "URL" to grab transcript, comments from it and send to chat or print it put to the console and store it in the output file
