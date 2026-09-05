@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `plist` utility for reading binary plist files on MacOS
 - Enable and configure `eslint-plugin-jsdoc`
 - Add `--youtube, -y` option for downloading YouTube transcripts
+- Integrate `execa` npm package for command execution
 
 ### Updated
 
