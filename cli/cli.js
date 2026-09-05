@@ -252,7 +252,7 @@ export default class CLI {
   /**
    * @param {object} params _
    * @param {object} params.options _
-   * @param {*} params.program _
+   * @param {object} params.program _
    * @param {string} params.stdin _
    * @returns {boolean} _
    */
