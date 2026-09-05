@@ -3,7 +3,11 @@ import readline from 'node:readline';
 
 /**
  * ⚠️ WORK IN PROGRESS
- * @description: Uses: Serp API (https://www.npmjs.com/package/serpapi)
+ * @description Uses: Serp API (https://www.npmjs.com/package/serpapi)
+ * @param {Array} options _ 
+ * @param {object} globalOptions _ 
+ * @param {object} cliInstance _ 
+ * @returns {undefined}
  */
 export default async function search(options, globalOptions, cliInstance) {
 
