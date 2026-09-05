@@ -129,6 +129,7 @@ cat example.txt | atlas --pattern explain_terms --temperature 0
 - [x] Add ability to execute plugin JS files
 - [x] Add ability to scan QR codes from image files
 - [x] Add ability to manipulate image files
+- [x] Integrate @clack/prompts for better CLI experience
 - [ ] Port to TypeScript
 - [ ] Introduce Agentic workflows based on LangGraph
 - [ ] Write Unit Tests
