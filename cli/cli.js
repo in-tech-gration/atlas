@@ -250,10 +250,11 @@ export default class CLI {
   }
 
   /**
-   * @param {Object} params 
-   * @param {Object} params.options 
-   * @param {*} params.program 
-   * @param {string} params.stdin 
+   * @param {object} params _
+   * @param {object} params.options _
+   * @param {*} params.program _
+   * @param {string} params.stdin _
+   * @returns {boolean} _
    */
   async execute({ options, program, stdin }) {
 
