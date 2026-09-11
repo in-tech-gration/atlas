@@ -25,3 +25,9 @@
   }
   ```
 
+## HOW TO | UPDATE PATTERNS FROM UPSTREAM REPO
+
+  - `git checkout upstream/main -- data/patterns/`
+  - Move `data/patterns/` into `patterns/`
+
+## HOW TO | CHECK IF A CLI TOOL EXISTS
