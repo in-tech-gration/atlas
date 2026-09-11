@@ -91,7 +91,7 @@ export default class CLI {
       .option('-t, --temperature [temperature]', 'Set temperature (default: 0.7)')
       .option('-m, --model [model]', 'Choose model (or show currently selected model [without parameters')
       .option('--context-window <size>', 'Set context window size (default: 2048)')
-      .option('-S, --setup [type]', 'Run setup for all reconfigurable parts of atlas. Use -S model to only set up the model. Use -S show to display API keys.')
+      .option('-S, --setup [type]', 'Run setup for all reconfigurable parts of atlas. Use `-S model` to only set up the model. Use `-S show` to display API keys.')
       .option('-l, --listpatterns [pattern]', 'List all patterns or find information about a particular pattern.')
       .option('--update', 'Update app version')
       .option('-c, --copy', 'Copy to clipboard')
@@ -384,6 +384,7 @@ export default class CLI {
       const apiPromptType = options.setup === "show" ? "text" : "password";
 
       // https://github.com/terkelg/prompts?tab=readme-ov-file#-types
+      // TODO: Replace with @clack/prompts
       const questions = [
         // PROVIDER SELECTION:
         {
@@ -887,7 +888,7 @@ export default class CLI {
                 }
               }
 
-              const voiceId = voices["Jarnathan Livingston"].id;
+              const voiceId = voices["Bella"].id;
 
               try {
 
