@@ -889,20 +889,33 @@ export default class CLI {
 
               const voiceId = voices["Jarnathan Livingston"].id;
 
-              const audio = await elevenlabs.textToSpeech.convert(voiceId, {
-                outputFormat: "mp3_44100_128",
-                text: output,
-                modelId: "eleven_multilingual_v2",
-              });
+              try {
 
-              if (options.verbose) {
-                // const usage = await elevenlabs.usage.getCharactersUsageMetrics({
-                //   start_unix: 1,
-                //   end_unix: 1
-                // });
-                // console.log({ usage });
+                const audio = await elevenlabs.textToSpeech.convert(voiceId, {
+                  outputFormat: "mp3_44100_128",
+                  text: output,
+                  modelId: "eleven_multilingual_v2",
+                });
+
+                if (options.verbose) {
+                  // const usage = await elevenlabs.usage.getCharactersUsageMetrics({
+                  //   start_unix: 1,
+                  //   end_unix: 1
+                  // });
+                  // console.log({ usage });
+                }
+                await play(audio);
+
+              } catch (error) {
+
+                const { statusCode, body: { detail: { message } } } = error;
+                if (statusCode === 402) {
+                  console.log(`ElevenLabs API ERROR (CODE: 402): ${message}`);
+                } else {
+                  console.log(error);
+                }
+
               }
-              await play(audio);
             }
 
             // Copy response to Clipboard
