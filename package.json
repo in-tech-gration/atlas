@@ -12,7 +12,9 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "jest": {
-    "testPathIgnorePatterns": ["<rootDir>/lambdas/common/test.js"]
+    "testPathIgnorePatterns": [
+      "<rootDir>/lambdas/common/test.js"
+    ]
   },
   "repository": {
     "type": "git",
