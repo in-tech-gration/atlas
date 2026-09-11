@@ -1,15 +1,7 @@
 package cli
 
 import (
-	"encoding/json"
-	"fmt"
-	"os"
-	"path/filepath"
-	"strconv"
-	"strings"
-
 	"github.com/danielmiessler/fabric/plugins/tools/youtube"
-
 	"github.com/danielmiessler/fabric/common"
 	"github.com/danielmiessler/fabric/core"
 	"github.com/danielmiessler/fabric/plugins/ai"

@@ -797,7 +797,7 @@ export default class CLI {
             const systemMessage = new SystemMessage(content);
             const humanMessage = new HumanMessage(`${data ? data : ""}\n${ stdin ? stdin : "" }`);
 
-            // console.log({ humanMessage, stdin, data });
+            // console.log({ systemMessage, humanMessage });
 
             const response = await this.chatModel.invoke([
               systemMessage,
@@ -926,6 +926,8 @@ export default class CLI {
               clipboardy.writeSync(output);
               console.log(chalk.gray("[Response copied to clipboard]"));
             }
+
+            // TODO: Write Response to file
 
           } catch (error) {
 
