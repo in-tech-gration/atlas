@@ -857,6 +857,7 @@ export default class CLI {
               await play(audio);
             }
 
+            // Copy response to Clipboard
             if (options.copy) {
               clipboardy.writeSync(output);
               console.log(chalk.gray("[Response copied to clipboard]"));
