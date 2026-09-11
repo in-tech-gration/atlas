@@ -795,7 +795,9 @@ export default class CLI {
             }
 
             const systemMessage = new SystemMessage(content);
-            const humanMessage = new HumanMessage(stdin ? stdin : data);
+            const humanMessage = new HumanMessage(`${data ? data : ""}\n${ stdin ? stdin : "" }`);
+
+            // console.log({ humanMessage, stdin, data });
 
             const response = await this.chatModel.invoke([
               systemMessage,
