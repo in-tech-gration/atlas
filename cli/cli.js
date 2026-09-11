@@ -30,7 +30,7 @@ import {
 import { providers, models } from "../common/providers.js";
 import clipboardy from 'clipboardy';
 import runPlay from "../plugins/experimental/play.js";
-import { ElevenLabsClient, play } from "elevenlabs";
+import { ElevenLabsClient, play } from "@elevenlabs/elevenlabs-js";
 import initializeLLM from "../common/llm.js";
 import yoctoSpinner from 'yocto-spinner';
 import matter from 'gray-matter';
@@ -842,11 +842,59 @@ export default class CLI {
             if (options.voice) {
               // https://github.com/elevenlabs/elevenlabs-js
               const elevenlabs = new ElevenLabsClient({/* apiKey: "" */ });
-              const audio = await elevenlabs.generate({
-                voice: "Sarah",
+
+              // console.log( await elevenlabs.voices.search() );
+              const voices = {
+                "Jarnathan Livingston": {
+                  id: 'PIGsltMj3gFMR34aFDI3',
+                  description: 'Jarnathan Livingston - authentic, calming and pleasing',
+                },
+                "Bella": {
+                  id: 'hpp4J3VqNfWAUOO0d1Us',
+                  description: 'Bella - Professional, Bright, Warm'
+                },
+                "Roger": {
+                  id: 'CwhRBWXzGAHq8TQ4Fs17',
+                  description: 'Roger - Laid-Back, Casual, Resonant'
+                },
+                "Sarah": {
+                  id: 'EXAVITQu4vr4xnSDxMaL',
+                  description: 'Sarah - Mature, Reassuring, Confident'
+                },
+                "Laura": {
+                  id: 'FGY2WhTYpPnrIDTdsKH5',
+                  description: 'Laura - Enthusiast, Quirky Attitude'
+                },
+                "Charlie": {
+                  id: 'IKne3meq5aSn9XLyUdCD',
+                  description: 'Charlie - Deep, Confident, Energetic'
+                },
+                "George": {
+                  id: 'JBFqnCBsd6RMkjVDRZzb',
+                  description: 'George - Warm, Captivating Storyteller'
+                },
+                "Callum": {
+                  id: 'N2lVS1w4EtoT3dr4eOWO',
+                  description: 'Callum - Husky Trickster'
+                },
+                "River": {
+                  id: 'SAz9YHcvj6GT2YYXdXww',
+                  description: 'River - Relaxed, Neutral, Informative'
+                },
+                "Harry": {
+                  id: 'SOYHLrjzK2X1ezoPC6cr',
+                  description: 'Harry - Fierce Warrior'
+                }
+              }
+
+              const voiceId = voices["Jarnathan Livingston"].id;
+
+              const audio = await elevenlabs.textToSpeech.convert(voiceId, {
+                outputFormat: "mp3_44100_128",
                 text: output,
-                model_id: "eleven_multilingual_v2",
+                modelId: "eleven_multilingual_v2",
               });
+
               if (options.verbose) {
                 // const usage = await elevenlabs.usage.getCharactersUsageMetrics({
                 //   start_unix: 1,
