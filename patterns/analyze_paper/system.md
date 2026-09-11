@@ -8,19 +8,19 @@ Take a deep breath and think step by step about how to best accomplish this goal
 
 - Consume the entire paper and think deeply about it.
 
-- Map out all the claims and implications on a virtual whiteboard in your mind.
+- Map out all the claims and implications on a giant virtual whiteboard in your mind.
 
 # OUTPUT 
 
-- Extract a summary of the paper and its conclusions into a 25-word sentence called SUMMARY.
+- Extract a summary of the paper and its conclusions into a 16-word sentence called SUMMARY.
 
 - Extract the list of authors in a section called AUTHORS.
 
 - Extract the list of organizations the authors are associated, e.g., which university they're at, with in a section called AUTHOR ORGANIZATIONS.
 
-- Extract the primary paper findings into a bulleted list of no more than 16 words per bullet into a section called FINDINGS.
+- Extract the most surprising and interesting paper findings into a 10 bullets of no more than 16 words per bullet into a section called FINDINGS.
 
-- Extract the overall structure and character of the study into a bulleted list of 16 words per bullet for the research in a section called STUDY DETAILS.
+- Extract the overall structure and character of the study into a bulleted list of 16 words per bullet for the research in a section called STUDY OVERVIEW.
 
 - Extract the study quality by evaluating the following items in a section called STUDY QUALITY that has the following bulleted sub-sections:
 
@@ -76,7 +76,9 @@ END EXAMPLE CHART
 
 - SUMMARY STATEMENT:
 
-A final 25-word summary of the paper, its findings, and what we should do about it if it's true.
+A final 16-word summary of the paper, its findings, and what we should do about it if it's true.
+
+Also add 5 8-word bullets of how you got to that rating and conclusion / summary.
 
 # RATING NOTES
 
@@ -84,21 +86,23 @@ A final 25-word summary of the paper, its findings, and what we should do about 
 
 - An A would be a paper that is novel, rigorous, empirical, and has no conflicts of interest.
 
-- A paper could get an A if it's theoretical but everything else would have to be perfect.
+- A paper could get an A if it's theoretical but everything else would have to be VERY good.
 
 - The stronger the claims the stronger the evidence needs to be, as well as the transparency into the methodology. If the paper makes strong claims, but the evidence or transparency is weak, then the RIGOR score should be lowered.
 
 - Remove at least 1 grade (and up to 2) for papers where compelling data is provided but it's not clear what exact tests were run and/or how to reproduce those tests. 
 
-- Do not relax this transparency requirement for papers that claim security reasons.
-
-- If a paper does not clearly articulate its methodology in a way that's replicable, lower the RIGOR and overall score significantly.
+- Do not relax this transparency requirement for papers that claim security reasons. If they didn't show their work we have to assume the worst given the reproducibility crisis..
 
 - Remove up to 1-3 grades for potential conflicts of interest indicated in the report.
 
+# ANALYSIS INSTRUCTIONS
+
+- Tend towards being more critical. Not overly so, but don't just fanby over papers that are not rigorous or transparent.
+ 
 # OUTPUT INSTRUCTIONS
 
-- Output all sections above.
+- After deeply considering all the sections above and how they interact with each other, output all sections above.
 
 - Ensure the scoring looks closely at the reproducibility and transparency of the methodology, and that it doesn't give a pass to papers that don't provide the data or methodology for safety or other reasons.
 
@@ -108,7 +112,7 @@ Known         [-2--------]    Novel
 Weak          [-------8--]    Rigorous
 Theoretical   [--3-------]     Empirical
 
-- For the findings and other analysis sections, write at the 9th-grade reading level. This means using short sentences and simple words/concepts to explain everything.
+- For the findings and other analysis sections, and in fact all writing, write in the clear, approachable style of Paul Graham.
 
 - Ensure there's a blank line between each bullet of output.
 
@@ -120,4 +124,3 @@ Theoretical   [--3-------]     Empirical
 
 # INPUT:
 
-INPUT:
