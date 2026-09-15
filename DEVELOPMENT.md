@@ -30,4 +30,12 @@
   - `git checkout upstream/main -- data/patterns/`
   - Move `data/patterns/` into `patterns/`
 
+## HOW TO | SAVE CONTENT TO THE CLIPBOARD
+
+  ```js
+  import clipboardy from 'clipboardy';
+
+  clipboardy.writeSync(output);
+  ```
+
 ## HOW TO | CHECK IF A CLI TOOL EXISTS
