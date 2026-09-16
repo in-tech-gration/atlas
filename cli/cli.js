@@ -17,28 +17,24 @@ import {
   OllamaError,
   selfUpdate,
 } from "../common/utils.js";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { HumanMessage } from "@langchain/core/messages";
 import chalk from 'chalk';
 import prompts from "prompts";
 import {
-  ATLAS_PATTERNS_DIR,
   getAPIKey,
   LAMBDAS_DIR,
-  PATTERNS_DIR,
   saveAPIKey,
 } from "../common/config.js";
 import { providers, models } from "../common/providers.js";
-import clipboardy from 'clipboardy';
 import runPlay from "../plugins/experimental/play.js";
-import { ElevenLabsClient, play } from "@elevenlabs/elevenlabs-js";
 import initializeLLM from "../common/llm.js";
 import yoctoSpinner from 'yocto-spinner';
-import matter from 'gray-matter';
 // PLUGINS:
 import mountUnmount from "../plugins/mount/index.js"
 import srt2json from "../plugins/subtitles/srt2json.plugin.js"
 import YouTube from "../plugins/tools/youtube/youtube.js"
 import web from "../plugins/web/index.js"
+import patternLoader from "../core/pattern.js";
 
 // import { listCalendarEvents } from "../plugins/google/calendar/calendar.js"
 
@@ -735,245 +731,19 @@ export default class CLI {
 
     if (options.pattern) {
 
-      let [pattern, ...data] = options.pattern;
-      if (Array.isArray(data)) data = data.join(" ");
-      // console.log({ pattern, data });
-
-      if (!data && !stdin) {
-        return console.log("Please provide some content.");
-      }
-
-      // First, check if the pattern exists in the primary patterns directory: patterns-atlas/
-      let patternFilePath = path.join(__dirname, "..", ATLAS_PATTERNS_DIR, pattern, "system.md");
-
       try {
 
-        await fs.access(patternFilePath);
+        return await patternLoader({ options, stdin, cliInstance: this });
 
-      } catch {
+      } catch (error) {
 
-        // If the pattern does not exist in the primary directory, check the alternative patterns directory: patterns/
-        patternFilePath = path.join(__dirname, "..", PATTERNS_DIR, pattern, "system.md");
-
-        try {
-          await fs.access(patternFilePath);
-        } catch {
-          return console.log(`Error initializing pattern: ${pattern}. Neither primary nor alternative pattern files exist.`);
+        if (options.verbose) {
+          return console.log(error);
         }
+
+        return console.log(chalk.redBright(error.message));
+
       }
-
-      const { llmProvider, model } = initializeLLM({ instance: this, options });
-
-      // TODO: Convert to async/await
-      return fs.readFile(patternFilePath, "utf8")
-        .then(async (fileContent) => {
-
-          const parsed = matter(fileContent);
-          const hasFm = Object.keys(parsed.data).length > 0;
-          // console.log( hasFm ? parsed.data : "No frontmatter found." );
-          let content = parsed.content;
-
-          try {
-
-            // if ( content.match(/^INPUT:/m) ){
-            //   content = content.replace(/^INPUT:/m, stdin ? stdin : data);
-            // }
-            // return console.log({ content });
-
-            const regex = /{{(.*?)}}/g;
-            const matches = content.match(regex);
-
-            // [WiP] Find all {{...}} variables in the content and replace them based on the variables provided:
-            // const variables = {};
-            // matches.forEach(match => {
-            //   const variableName = match.replace(/{{|}}/g, "").trim();
-            //   variables[variableName] = data;
-            // });
-            // console.log(variables);
-
-            // Replace all {{...}} with the data provided:
-            if (matches && data) {
-              content = content.replace(/{{(.*?)}}/g, data);
-            }
-
-            const systemMessage = new SystemMessage(content);
-            const humanMessage = new HumanMessage(`${data ? data : ""}\n${stdin ? stdin : ""}`);
-
-            // console.log({ systemMessage, humanMessage });
-
-            let output;
-            let totalInputLength = systemMessage.content.length + humanMessage.content.length;
-
-            if (options.verbose) {
-              console.log(chalk.gray("[VERBOSE OUTPUT ENABLED][ TOTAL INPUT LENGTH ]"));
-              console.log(totalInputLength);
-              console.log("\n");
-            }
-
-            // Check if the input length exceeds the context window (Ollama only):
-            if (llmProvider === "provider_ollama") {
-              let currentContextWindow = 2048;
-              if (options.contextWindow) {
-                currentContextWindow = parseInt(options.contextWindow);
-              }
-              if (totalInputLength > currentContextWindow) {
-                console.log(chalk.redBright(`[ WARNING ] Your input (${totalInputLength}) is longer that the current context window (${currentContextWindow}). Please consider reducing the input size to fit the current context window or increasing the context window using the --context-window <size> option.`));
-                return 1;
-              }
-            }
-
-            const response = await this.chatModel.invoke([
-              systemMessage,
-              humanMessage,
-            ]);
-
-            if (
-              llmProvider === "provider_ollama"
-              || llmProvider === "provider_groq"
-              || llmProvider === "provider_anthropic"
-              || llmProvider === "provider_gemini"
-            ) {
-              output = response.content;
-            } else {
-              output = response;
-            }
-
-            if (options.verbose) {
-              console.log(chalk.gray("[VERBOSE OUTPUT ENABLED][ RESPONSE ]"));
-              console.log(response);
-            } else {
-              console.log(output);
-            }
-
-            if (options.voice) {
-              // https://github.com/elevenlabs/elevenlabs-js
-              const elevenlabs = new ElevenLabsClient({/* apiKey: "" */ });
-
-              // console.log( await elevenlabs.voices.search() );
-              const voices = {
-                "Jarnathan Livingston": {
-                  id: 'PIGsltMj3gFMR34aFDI3',
-                  description: 'Jarnathan Livingston - authentic, calming and pleasing',
-                },
-                "Bella": {
-                  id: 'hpp4J3VqNfWAUOO0d1Us',
-                  description: 'Bella - Professional, Bright, Warm'
-                },
-                "Roger": {
-                  id: 'CwhRBWXzGAHq8TQ4Fs17',
-                  description: 'Roger - Laid-Back, Casual, Resonant'
-                },
-                "Sarah": {
-                  id: 'EXAVITQu4vr4xnSDxMaL',
-                  description: 'Sarah - Mature, Reassuring, Confident'
-                },
-                "Laura": {
-                  id: 'FGY2WhTYpPnrIDTdsKH5',
-                  description: 'Laura - Enthusiast, Quirky Attitude'
-                },
-                "Charlie": {
-                  id: 'IKne3meq5aSn9XLyUdCD',
-                  description: 'Charlie - Deep, Confident, Energetic'
-                },
-                "George": {
-                  id: 'JBFqnCBsd6RMkjVDRZzb',
-                  description: 'George - Warm, Captivating Storyteller'
-                },
-                "Callum": {
-                  id: 'N2lVS1w4EtoT3dr4eOWO',
-                  description: 'Callum - Husky Trickster'
-                },
-                "River": {
-                  id: 'SAz9YHcvj6GT2YYXdXww',
-                  description: 'River - Relaxed, Neutral, Informative'
-                },
-                "Harry": {
-                  id: 'SOYHLrjzK2X1ezoPC6cr',
-                  description: 'Harry - Fierce Warrior'
-                }
-              }
-
-              const voiceId = voices["Bella"].id;
-
-              try {
-
-                const audio = await elevenlabs.textToSpeech.convert(voiceId, {
-                  outputFormat: "mp3_44100_128",
-                  text: output,
-                  modelId: "eleven_multilingual_v2",
-                });
-
-                if (options.verbose) {
-                  // const usage = await elevenlabs.usage.getCharactersUsageMetrics({
-                  //   start_unix: 1,
-                  //   end_unix: 1
-                  // });
-                  // console.log({ usage });
-                }
-                await play(audio);
-
-              } catch (error) {
-
-                const { statusCode, body: { detail: { message } } } = error;
-                if (statusCode === 402) {
-                  console.log(`ElevenLabs API ERROR (CODE: 402): ${message}`);
-                } else {
-                  console.log(error);
-                }
-
-              }
-            }
-
-            // Copy response to Clipboard
-            if (options.copy) {
-              clipboardy.writeSync(output);
-              console.log(chalk.gray("[Response copied to clipboard]"));
-            }
-
-            // TODO: Write Response to file
-
-          } catch (error) {
-
-            // Handle case where Ollama might not be running locally:
-            const isChatOllama = this.chatModel instanceof ChatOllama;
-            // TODO: Move LLM-related code to the llm module:
-            if (error.message === "fetch failed" && isChatOllama) {
-
-              console.log(chalk.redBright("[ ERROR:LLM:INIT ]"), `Error trying to initialize ${chalk.bold(this.model)} model. \nPlease make sure that Ollama is running ${chalk.italic(`('ollama run ${this.model}')`)} and that the model is available.`);
-
-              console.log(chalk.green("Troubleshooting:"), `Have you ran ${chalk.bold(`ollama pull ${this.model}`)} to download the model?`);
-
-              console.log(chalk.redBright("(debug:info:initLLM)"));
-
-            } else {
-
-              // console.log(this.chatModel); 
-              if (this.chatModel instanceof ChatAnthropic) {
-
-                console.log(chalk.redBright("ERROR (ChatAntropic):", error.error.error.message));
-
-                // GENERIC
-              } else {
-                console.log(chalk.redBright("ERROR:", error));
-              }
-
-            }
-
-          }
-
-          // [ DEPRECATED ] In favour of simpler invocation with plain text input (see above)
-          // const prompt = ChatPromptTemplate.fromMessages([
-          //   ["system", content],
-          //   ["human", stdin ? stdin : data],
-          // ]);
-          // const parser = new StringOutputParser();
-          // const chain = prompt.pipe(this.chatModel).pipe(parser);
-          // console.log(await chain.invoke());
-
-        })
-        .catch((error) => {
-          console.log("File does not exist.", error);
-        });
 
     }
 
