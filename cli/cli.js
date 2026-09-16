@@ -764,6 +764,7 @@ export default class CLI {
 
       const { llmProvider, model } = initializeLLM({ instance: this, options });
 
+      // TODO: Convert to async/await
       return fs.readFile(patternFilePath, "utf8")
         .then(async (fileContent) => {
 
@@ -796,14 +797,9 @@ export default class CLI {
             }
 
             const systemMessage = new SystemMessage(content);
-            const humanMessage = new HumanMessage(`${data ? data : ""}\n${ stdin ? stdin : "" }`);
+            const humanMessage = new HumanMessage(`${data ? data : ""}\n${stdin ? stdin : ""}`);
 
             // console.log({ systemMessage, humanMessage });
-
-            const response = await this.chatModel.invoke([
-              systemMessage,
-              humanMessage,
-            ]);
 
             let output;
             let totalInputLength = systemMessage.content.length + humanMessage.content.length;
@@ -822,8 +818,14 @@ export default class CLI {
               }
               if (totalInputLength > currentContextWindow) {
                 console.log(chalk.redBright(`[ WARNING ] Your input (${totalInputLength}) is longer that the current context window (${currentContextWindow}). Please consider reducing the input size to fit the current context window or increasing the context window using the --context-window <size> option.`));
+                return 1;
               }
             }
+
+            const response = await this.chatModel.invoke([
+              systemMessage,
+              humanMessage,
+            ]);
 
             if (
               llmProvider === "provider_ollama"
