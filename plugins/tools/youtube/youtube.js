@@ -1,4 +1,6 @@
 import xml2js from "xml2js";
+import Innertube from "youtubei.js";
+import { youTubeTranscript2SRT } from "../../subtitles/subtitle-utils.js";
 
 function getYouTubeVideoIdFromURL(url) {
 
@@ -18,9 +20,10 @@ function getYouTubeVideoIdFromURL(url) {
  * Based on: https://medium.com/@aqib-2/extract-youtube-transcripts-using-innertube-api-2025-javascript-guide-dc417b762f49
  * @param {string} videoId - YouTube video ID
  * @param {string} language - Language code, e.g., "en", "hi"
+ * @param {boolean} srt - Whether to output transcript in SRT format
  * @returns {Promise<Array<{ caption: string, startTime: number, endTime: number }>>} _
  */
-async function getYoutubeTranscript(videoId, language = "en") {
+async function getYoutubeTranscript(videoId, language = "en", srt = false) {
 
   const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
@@ -58,9 +61,35 @@ async function getYoutubeTranscript(videoId, language = "en") {
   // Step 4
   const xml = await fetch(baseUrl).then(res => res.text());
   const json = await xml2js.parseStringPromise(xml);
-  const transcript = json.transcript.text.map(t => {
-    return `${t._} `;
-  }).join("").replaceAll("&#39;", "'");
+  let transcript = "";
+
+  // SRT FORMAT:
+  if (srt) {
+
+    transcript = youTubeTranscript2SRT(json.transcript.text);
+
+  } else {
+
+    transcript = json.transcript.text.map(t => {
+      return `${t._} `;
+    }).join("");
+
+  }
+
+  // DECODE HTML ENTITIES
+  const escapeMap = {
+    '&quot;': '"',
+    '&amp;': '&',
+    '&#x27;': '\'',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&#x60;': '`',
+    "&#39;": "'",
+  };
+
+  Object.entries(escapeMap).forEach(([code, value]) => {
+    transcript = transcript.replaceAll(code, value);
+  });
 
   return transcript;
 
@@ -85,11 +114,12 @@ export default async function YouTube({ options, instance }) {
 
   try {
 
-    const transcript = await getYoutubeTranscript(videoId);
+    const { format } = options;
+    const transcript = await getYoutubeTranscript(videoId, "en", Boolean(format));
     console.log(transcript);
 
   } catch (error) {
-    
+
     console.log(error);
 
   }

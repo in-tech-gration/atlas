@@ -53,15 +53,15 @@ process.on("uncaughtException", (error) => {
 /**
  * @typedef ConfigStore
  * @type {object}
- * @property {string} path 
- * @property {any} all 
- * @property {number} size 
- * @property {{(key: string) => any}} get 
- * @property {{(key: string, val: any) => void}} set
- * @property {{(values: any) => void}} set
- * @property {{(key: string) => boolean}} has
- * @property {{(key: string) => void}} delete
- * @property {{() => void}} clear
+ * @property {string} path _
+ * @property {any} all _
+ * @property {number} size _
+ * @property {{(key: string) => any}} get _
+ * @property {{(key: string, val: any) => void}} set _
+ * @property {{(values: any) => void}} set _
+ * @property {{(key: string) => boolean}} has _
+ * @property {{(key: string) => void}} delete _
+ * @property {{() => void}} clear _
  */
 export default class CLI {
 
@@ -99,7 +99,8 @@ export default class CLI {
       .option('--verbose', 'Verbose output (when available)')
       .option('--srt2json <file>', 'Convert SRT file to JSON')
       .option('--mount <state>', 'Mount/unmount one or more drives: --mount on|off|set (MacOS)')
-      .option('-y, --youtube <url>', 'YouTube video URL or Video ID to grab transcript')
+      .option('--format <value>') // Generic format option for use in conjunction with other options
+      .option('-y, --youtube <url>', 'YouTube video URL or Video ID to grab transcript. Use `--format=srt` for SRT output.')
       .option('-u, --use [plugin...]', 'Use plugin')
       // TODO: Implement all fabric options:
       // -y, --youtube=                    YouTube video or play list "URL" to grab transcript, comments from it and send to chat or print it put to the console and store it in the output file
