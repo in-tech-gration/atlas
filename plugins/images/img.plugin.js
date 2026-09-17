@@ -132,6 +132,7 @@ function displaySupportedFilters(filters) {
 
 }
 
+// TODO: Batch Image (Files/Folders) Processing
 export default async function img(options) {
 
   let [filter, filename] = options;
@@ -167,6 +168,7 @@ export default async function img(options) {
 
   const fname = path.parse(filename);
 
+  // SHARPEN
   if (filter === "sharpen") {
 
     const image = await Jimp.read(filename);
@@ -189,6 +191,7 @@ export default async function img(options) {
 
   }
 
+  // UPSCALE/DOWNSCALE
   if (filter === "upscale" || filter === "downscale") {
 
     const image = await Jimp.read(filename);
@@ -198,6 +201,7 @@ export default async function img(options) {
 
   }
 
+  // SCALE
   if (filter === "scale") {
 
     if (!filterParams) {
