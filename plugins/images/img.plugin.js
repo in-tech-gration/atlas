@@ -174,16 +174,34 @@ export default async function img(options) {
 
     const isDir = fs.lstatSync(filename).isDirectory();
 
+    // https://github.com/naptha/tesseract.js/blob/master/docs/image-format.md
+    const supportedImageFileFormats = [
+      "bmp",
+      "gif",
+      "jpg",
+      "pbm",
+      "png",
+      "webp",
+    ];
+
+    // BATCH PROCESSING
+    // https://raw.githubusercontent.com/naptha/tesseract.js/refs/heads/master/examples/node/scheduler.js
     if (isDir) {
 
       // console.log("Batch processing...");
 
       const isFile = fileName => {
-        return fs.lstatSync(fileName).isFile();
+        const lstat = fs.lstatSync(fileName);
+        return lstat.isFile();
       };
 
       const imageArr = fs.readdirSync(filename)
         .map(fileName => path.join(filename, fileName))
+        .filter(file => {
+          const extname = path.extname(file);
+          const ext = extname.split(".")[1];
+          return supportedImageFileFormats.includes(ext);
+        })
         .filter(isFile);
 
       // console.log(imageArr);
