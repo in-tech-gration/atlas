@@ -171,12 +171,72 @@ export default async function img(options) {
 
   // OCR
   if (filter === "ocr") {
-    const { createWorker } = await import("tesseract.js");
-    const worker = await createWorker('eng');
-    const image = path.resolve(filename);
-    const ret = await worker.recognize(image);
-    console.log(ret.data.text);
-    await worker.terminate();
+
+    const isDir = fs.lstatSync(filename).isDirectory();
+
+    if (isDir) {
+
+      // console.log("Batch processing...");
+
+      const isFile = fileName => {
+        return fs.lstatSync(fileName).isFile();
+      };
+
+      const imageArr = fs.readdirSync(filename)
+        .map(fileName => path.join(filename, fileName))
+        .filter(isFile);
+
+      // console.log(imageArr);
+
+      const { createWorker, createScheduler } = await import("tesseract.js");
+      const scheduler = createScheduler();
+
+      // Creates worker and adds to scheduler
+      const workerGen = async () => {
+        const worker = await createWorker('eng', 1, { cachePath: '.' });
+        scheduler.addWorker(worker);
+      };
+
+      const workerN = 4;
+      (async () => {
+        const resArr = Array(workerN);
+        for (let i = 0; i < workerN; i++) {
+          resArr[i] = workerGen();
+        }
+        await Promise.all(resArr);
+
+        const resArr2 = Array(imageArr.length);
+
+        for (let i = 0; i < imageArr.length; i++) {
+          resArr2[i] = scheduler
+            .addJob('recognize', imageArr[i])
+            .then((x) => x.data.text);
+        }
+
+        const res = await Promise.all(resArr2);
+        let output = "";
+        res.forEach((r, index) => {
+          output += `(Image #${index + 1}) | ${imageArr[index]}\n\n`;
+          output += r;
+          output += "\n---\n";
+          output += "\n";
+        });
+        console.log(output);
+        await scheduler.terminate(); // It also terminates all workers.
+
+      })();
+
+    } else {
+
+      const { createWorker } = await import("tesseract.js");
+      const worker = await createWorker('eng');
+      const image = path.resolve(filename);
+      const ret = await worker.recognize(image);
+      console.log(ret.data.text);
+      await worker.terminate();
+
+    }
+
   }
 
   // SHARPEN
