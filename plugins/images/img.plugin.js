@@ -115,6 +115,7 @@ const convolution = (
 
 const filtersWithParams = [
   ["downscale", "[=<NUMBER>]"],
+  ["ocr", " (Optical Character Recognition)"],
   ["scale", "=<NUMBER>"],
   ["sharpen", "=<NUMBER>"],
   ["upscale", "[=<NUMBER>]"],
@@ -138,7 +139,7 @@ export default async function img(options) {
   let [filter, filename] = options;
   // console.log("img()", filter, filename);
 
-  const filters = filtersWithParams.map( filterWithParams =>{
+  const filters = filtersWithParams.map(filterWithParams => {
     return filterWithParams[0];
   });
 
@@ -167,6 +168,16 @@ export default async function img(options) {
   }
 
   const fname = path.parse(filename);
+
+  // OCR
+  if (filter === "ocr") {
+    const { createWorker } = await import("tesseract.js");
+    const worker = await createWorker('eng');
+    const image = path.resolve(filename);
+    const ret = await worker.recognize(image);
+    console.log(ret.data.text);
+    await worker.terminate();
+  }
 
   // SHARPEN
   if (filter === "sharpen") {
