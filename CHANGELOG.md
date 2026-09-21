@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.71] - 18/09/2026
+## [0.1.8] - 21/09/2026
 
 ### Added
 
@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add General-purpose `atlas -u converter` plugin with support for HH:MM:SS-to-Seconds and vice versa
 - Add `--format=srt` option to YouTube transcript downloader (`--youtube`)
 - Add image OCR support in the `img` plugin: `atlas -u img ocr file.jpg`
+- Add `set_secret=provider,secret` option to Authenticator plugin
+- Add support for extracting Authenticator keys via the `otpauth://` protocol
 
 ### Fixed
 

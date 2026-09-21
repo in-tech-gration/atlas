@@ -14,7 +14,7 @@ import base32 from "hi-base32";
 async function extractGoogleAuthenticatorSecret(migrationUrl) {
 
   const __dirname = import.meta.dirname;
-  const googleAuthProtoFilepath = path.join( __dirname, "google-auth.proto" );
+  const googleAuthProtoFilepath = path.join(__dirname, "google-auth.proto");
 
   // extract base64 payload
   const data = new URL(migrationUrl).searchParams.get("data");
@@ -56,10 +56,10 @@ export default async function authy(options, globalOptions, cliInstance) {
 
   const providersJSON = cliInstance.config.get('authenticator');
 
-  if ( !providersJSON ){
+  if (!providersJSON) {
     return console.log("ERROR: Authenticator providers configuration not found.");
   }
-  
+
   const providers = [];
   const providersObject = JSON.parse(providersJSON);
   const { providersSecrets } = providersObject;
@@ -67,20 +67,47 @@ export default async function authy(options, globalOptions, cliInstance) {
 
   if (options.length > 0) {
 
+    if (options[0].trim().startsWith("set_secret")) {
+
+      const [_, value] = options[0].trim().split("=");
+      const [provider, secret] = value.split(",");
+      providersObject.providersSecrets[provider] = secret;
+      cliInstance.config.set('authenticator', JSON.stringify(providersObject));
+
+      return;
+    }
+
     // Conversion of exported key:
     const otpMigrationPrefix = "otpauth-migration://";
-    
-    if ( options[0].startsWith(otpMigrationPrefix) ){
+    const otpAuthPrefix = "otpauth://";
 
-      const migrationCode = options[0];
-      const secretKeyObj = await extractGoogleAuthenticatorSecret(migrationCode);
+    if (
+      options[0].startsWith(otpMigrationPrefix)
+      ||
+      options[0].startsWith(otpAuthPrefix)
+    ) {
 
-      return console.log("Secret Key: " + secretKeyObj.secret);
+      try {
+
+        const migrationCode = options[0];
+        if (options[0].startsWith("otpauth://")) {
+          return console.log("Secret Key: " + new URL(migrationCode).searchParams.get("secret"));
+        }
+
+        const secretKeyObj = await extractGoogleAuthenticatorSecret(migrationCode);
+        return console.log("Secret Key: " + secretKeyObj.secret);
+
+      } catch (error) {
+
+        console.log(error);
+        return 1;
+
+      }
 
     }
 
     const provider = options[0].toLowerCase();
-    if ( defaultProviders.includes(provider) ){
+    if (defaultProviders.includes(provider)) {
       providers.push(provider);
     }
 
