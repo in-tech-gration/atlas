@@ -7,9 +7,9 @@ import chalk from "chalk";
 const GENERATE = "generate";
 
 export default async function qrCodeScanner(options, globalOptions) {
-  
 
-  if ( options[0] === GENERATE && options[1] ){
+
+  if (options[0] === GENERATE && options[1]) {
 
     const textToBeEncoded = options[1];
     // WORK IN PROGRESS...
@@ -23,37 +23,37 @@ export default async function qrCodeScanner(options, globalOptions) {
   }
   const filename = process.argv[4];
   const fileExtension = path.extname(filename);
-  
-  if ( fileExtension === ".webp" ){
+
+  if (fileExtension === ".webp") {
     return console.log(chalk.red("ERROR: Webp image file format is not supported. Try converting to PNG."));
   }
-  
+
   try {
-    
+
     const buffer = await fs.promises.readFile(filename);
     const image = await Jimp.read(buffer);
-    
+
     const qr = new QrCode();
     qr.callback = (error, value) => {
       if (error) {
-        console.log( "ERROR::QRCode: " + error );
+        console.log("ERROR::QRCode: " + error);
         return console.log("¯\\(ツ)/¯ ");
       };
       console.log("QR decoded:", value.result);
     };
-    
+
     qr.decode(image.bitmap);
 
   } catch (error) {
 
-    if ( globalOptions.verbose ){
+    if (globalOptions.verbose) {
       console.log(error.stack);
     } else {
       console.log(`ERROR: ${error.message}`);
     }
 
   }
-  
+
 }
 // Alternatives:
 // npm install jsqr (Fast, low-level, pure-JS that requires raw image data -pixel buffer)
