@@ -22,6 +22,7 @@
 
   ```js
   export default async function pluginName(options, globalOptions, cliInstance) {
+      const { verbose: isVerbose } = globalOptions;
   }
   ```
 
