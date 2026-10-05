@@ -18,12 +18,13 @@ function getYouTubeVideoIdFromURL(url) {
 /**
  * Get captions for a given YouTube video and language (default: English).
  * Based on: https://medium.com/@aqib-2/extract-youtube-transcripts-using-innertube-api-2025-javascript-guide-dc417b762f49
- * @param {string} videoId - YouTube video ID
- * @param {string} language - Language code, e.g., "en", "hi"
- * @param {boolean} srt - Whether to output transcript in SRT format
+ * @param {object} params _
+ * @param {object} params.videoId - YouTube video ID
+ * @param {object} params.language - Language code, e.g., "en", "hi"
+ * @param {object} params.srt - Whether to output transcript in SRT format
  * @returns {Promise<Array<{ caption: string, startTime: number, endTime: number }>>} _
  */
-async function getYoutubeTranscript(videoId, language = "en", srt = false) {
+async function getYoutubeTranscript({ videoId, language = "en", srt = false }) {
 
   const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
@@ -52,9 +53,16 @@ async function getYoutubeTranscript(videoId, language = "en", srt = false) {
 
   // Step 3
   const tracks = playerData?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
-  if (!tracks) throw new Error("No captions found.");
+
+  if (!tracks) {
+    throw new Error("No captions found.");
+  }
+
   const track = tracks.find(t => t.languageCode === language);
-  if (!track) throw new Error(`No captions for language: ${language}`);
+
+  if (!track) {
+    throw new Error(`No captions for language: ${language}`);
+  }
 
   const baseUrl = track.baseUrl.replace(/&fmt=\w+$/, "");
 
@@ -101,6 +109,7 @@ export default async function YouTube({ options, instance }) {
    * @type {string}
    */
   const youTubeURLorId = options.youtube;
+  const isVerbose = options.verbose;
 
   if (!youTubeURLorId) {
     return console.log("Missing YouTube URL or VideoID.");
@@ -115,12 +124,21 @@ export default async function YouTube({ options, instance }) {
   try {
 
     const { format } = options;
-    const transcript = await getYoutubeTranscript(videoId, "en", Boolean(format));
+    const transcript = await getYoutubeTranscript({
+      videoId,
+      language: "en",
+      srt: Boolean(format),
+    });
+
     console.log(transcript);
 
   } catch (error) {
 
-    console.log(error);
+    if (isVerbose) {
+      return console.log(error);
+    }
+
+    console.log(error.message);
 
   }
 
