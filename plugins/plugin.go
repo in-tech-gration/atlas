@@ -1,12 +1,3 @@
-package plugins
-
-import (
-	"bytes"
-	"fmt"
-	"os"
-	"strings"
-)
-
 const AnswerReset = "reset"
 
 type Plugin interface {
@@ -27,10 +18,6 @@ type PluginBase struct {
 	EnvNamePrefix    string
 
 	ConfigureCustom func() error
-}
-
-func (o *PluginBase) GetName() string {
-	return o.Name
 }
 
 func (o *PluginBase) GetSetupDescription() (ret string) {
@@ -139,10 +126,6 @@ func (o *Setting) FillEnvFileContent(buffer *bytes.Buffer) {
 	return
 }
 
-func (o *Setting) Print() {
-	fmt.Printf("%v: %v\n", o.EnvVariable, o.Value)
-}
-
 func NewSetupQuestion(question string) *SetupQuestion {
 	return &SetupQuestion{Setting: &Setting{}, Question: question}
 }
@@ -192,8 +175,6 @@ func (o *SetupQuestion) OnAnswer(answer string) (err error) {
 	return
 }
 
-type Settings []*Setting
-
 func (o Settings) IsConfigured() (ret bool) {
 	ret = true
 	for _, setting := range o {
@@ -220,8 +201,6 @@ func (o Settings) FillEnvFileContent(buffer *bytes.Buffer) {
 	return
 }
 
-type SetupQuestions []*SetupQuestion
-
 func (o SetupQuestions) Ask(label string) (err error) {
 	fmt.Println()
 	fmt.Printf("[%v]\n", label)
@@ -231,17 +210,4 @@ func (o SetupQuestions) Ask(label string) (err error) {
 		}
 	}
 	return
-}
-
-func BuildEnvVariablePrefix(name string) (ret string) {
-	ret = BuildEnvVariable(name)
-	if ret != "" {
-		ret += "_"
-	}
-	return
-}
-
-func BuildEnvVariable(name string) string {
-	name = strings.TrimSpace(name)
-	return strings.ReplaceAll(strings.ToUpper(name), " ", "_")
 }
