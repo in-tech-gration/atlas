@@ -1,6 +1,10 @@
+import fs from "node:fs/promises";
 import xml2js from "xml2js";
 import Innertube from "youtubei.js";
 import { youTubeTranscript2SRT } from "../../subtitles/subtitle-utils.js";
+import { select, isCancel, confirm, text } from '@clack/prompts';
+
+// WORK IN PROGRESS
 
 function getYouTubeVideoIdFromURL(url) {
 
@@ -59,12 +63,49 @@ async function getYoutubeTranscript({ videoId, language = "en", srt = false }) {
   }
 
   const track = tracks.find(t => t.languageCode === language);
+  let baseUrl;
+  let hasCustomTrack = false;
 
   if (!track) {
-    throw new Error(`No captions for language: ${language}`);
-  }
 
-  const baseUrl = track.baseUrl.replace(/&fmt=\w+$/, "");
+    console.log(`No captions for language '${language}'.`);
+
+    const options = tracks.map(track => {
+
+      const name = track.name.runs[0].text;
+
+      return {
+        value: track.languageCode,
+        label: name,
+        hint: track.languageCode,
+      }
+    })
+
+    const action = await select({
+      message: 'Please select another caption:',
+      options,
+    });
+
+    if (isCancel(action)) {
+      console.log('Operation cancelled');
+      process.exit(0);
+    }
+
+    if (action === 'exit') return;
+
+    const selectedTrack = tracks.find(t => {
+      return t.languageCode === action;
+    })
+
+    // console.log({ action, selectedTrack });
+    baseUrl = selectedTrack.baseUrl.replace(/&fmt=\w+$/, "");
+    hasCustomTrack = true;
+
+  } else {
+
+    baseUrl = track.baseUrl.replace(/&fmt=\w+$/, "");
+
+  }
 
   // Step 4
   const xml = await fetch(baseUrl).then(res => res.text());
@@ -98,6 +139,20 @@ async function getYoutubeTranscript({ videoId, language = "en", srt = false }) {
   Object.entries(escapeMap).forEach(([code, value]) => {
     transcript = transcript.replaceAll(code, value);
   });
+
+  // Write to file (for custom language selection)
+  if (hasCustomTrack) {
+    const saveToFile = await confirm({
+      message: "Save transcript to a file?",
+    });
+    if (saveToFile) {
+      const name = await text({
+        message: 'Enter filename for transcript file:',
+        initialValue: `${videoId}.transcript.txt`,
+      });
+      await fs.writeFile(name, transcript);
+    }
+  }
 
   return transcript;
 
