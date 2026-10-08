@@ -22,7 +22,7 @@
 
   ```js
   export default async function pluginName(options, globalOptions, cliInstance) {
-      const { verbose: isVerbose } = globalOptions;
+    const { verbose: isVerbose } = globalOptions;
   }
   ```
 
@@ -34,7 +34,7 @@
 ## HOW TO | SAVE CONTENT TO THE CLIPBOARD
 
   ```js
-  import clipboardy from 'clipboardy';
+  import clipboardy from "clipboardy";
 
   clipboardy.writeSync(output);
   ```
@@ -97,3 +97,5 @@
     }
   }
   ```
+
+<!-- ## HOW TO | CHECK IF A CLI TOOL EXISTS -->
