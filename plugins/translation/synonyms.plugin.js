@@ -19,7 +19,12 @@ export default async function synonyms(options, globalOptions, cliInstance) {
     return console.log("ERROR: Missing word");
   }
 
-  const firstLetter = word[0].toUpperCase();
+  const firstLetter = word[0]
+    .toUpperCase()
+    // Remove accented characters
+    .normalize("NFKD")
+    .replace(/\p{Diacritic}/gu, "");
+
   const synonyms = json[firstLetter][word];
 
   if ( !synonyms ){
