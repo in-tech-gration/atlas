@@ -21,6 +21,12 @@ export default async function synonyms(options, globalOptions, cliInstance) {
 
   const firstLetter = word[0].toUpperCase();
   const synonyms = json[firstLetter][word];
+
+  if ( !synonyms ){
+    return console.log(`\nCould not find synonyms for '${word}'.\n`);
+    
+  }
+
   console.log(
     `\nSynonyms for ${chalk.yellowBright(word)} => ${chalk.cyanBright(synonyms)} ${chalk.gray("(Copied to clipboard)")}\n`
   );
