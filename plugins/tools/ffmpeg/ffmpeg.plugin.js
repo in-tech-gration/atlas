@@ -3,6 +3,21 @@ import { execa } from 'execa';
 import { text, select, confirm, tasks, spinner, isCancel } from '@clack/prompts';
 import chalk from 'chalk';
 
+// HELPERS
+function escapeFilename(inputFilenameRaw) {
+
+  const inputFilename = inputFilenameRaw
+    .replaceAll("'", "")
+    .replaceAll("\\ ", " ")
+    .replaceAll("\\(", "(")
+    .replaceAll("\\)", ")")
+    .trim();
+
+  return inputFilename;
+
+}
+
+// CONVERSIONS
 async function extractWAV() {
   const inputFilename = await text({
     message: 'Enter filename:',
@@ -288,7 +303,7 @@ async function trimEnd() {
     },
   });
 
-  const inputFilename = inputFilenameRaw.replaceAll("'", "").replaceAll("\\ ", " ").trim();
+  const inputFilename = escapeFilename(inputFilenameRaw);
   const fileExtension = path.extname(inputFilename);
   const fileNameWithoutExtension = path.basename(inputFilename, path.extname(inputFilename));
 
@@ -369,6 +384,98 @@ async function trimEnd() {
 
 }
 
+async function trimStart() {
+
+  const inputFilenameRaw = await text({
+    message: 'Enter filename:',
+    validate: (value) => {
+      if (!value) return 'Filename is required';
+      return undefined;
+    },
+  });
+
+  const inputFilename = escapeFilename(inputFilenameRaw);
+
+  const fileExtension = path.extname(inputFilename);
+  const fileNameWithoutExtension = path.basename(inputFilename, path.extname(inputFilename));
+
+  const outputExtension = fileExtension.trim();
+
+  if (isCancel(inputFilename)) {
+    console.log('Operation cancelled');
+    return;
+  }
+
+  const trimStart = await text({
+    message: 'Enter timestamp trim point (end point):',
+    validate: (value) => {
+      if (!value) return 'Timestamp is required';
+      return undefined;
+    },
+  });
+  const trimmedFilename = `${fileNameWithoutExtension}-trimmed${outputExtension}`;
+  const inputFileNameEscaped = inputFilename;
+
+  // `ffmpeg -i input.mp4 -c:v copy -c:a copy -to 100 output.mp4`
+  const execaOptions = [
+    '-i',
+    inputFileNameEscaped,
+    '-c:v',
+    'copy',
+    '-c:a',
+    'copy',
+    '-ss',
+    trimStart,
+    trimmedFilename,
+  ]
+
+  const cmd = "ffmpeg " + execaOptions.join(" ");
+
+  const confirmCommand = await confirm({
+    message: `Proceed with command: ${cmd}`,
+  });
+
+  const spin = spinner();
+  spin.start(`Trimming file (${inputFilename})...`);
+
+  await tasks([
+    {
+      title: 'Trimming',
+      task: async () => {
+        try {
+          const trimEnd = execa(
+            'ffmpeg',
+            execaOptions,
+            // { stdio: "inherit" }
+          );
+
+          // Handle output as it arrives
+          trimEnd.stdout.on('data', (data) => {
+            // Process each chunk of output
+            console.log(data.toString().trim());
+          });
+
+          try {
+            await trimEnd;
+          } catch (error) {
+            console.error('Error:', error.message);
+          }
+
+        } catch (error) {
+
+          console.log(error);
+
+        }
+
+        return 'Trimming finished';
+      },
+    },
+  ]);
+
+  spin.stop(`Trimmed file created: ${trimmedFilename}`);
+
+}
+
 export default async function ffmpeg(options, globalOptions, cliInstance) {
 
   const { verbose: isVerbose } = globalOptions;
@@ -387,6 +494,7 @@ export default async function ffmpeg(options, globalOptions, cliInstance) {
       { value: 'extract_wav', label: 'Extract WAV audio', hint: '' },
       { value: 'extract_partial_audio', label: 'Extract partial audio from video', hint: '' },
       { value: 'trim_end', label: 'Trim end of file', hint: '' },
+      { value: 'trim_start', label: 'Trim start of file', hint: '' },
     ],
   });
 
@@ -398,6 +506,11 @@ export default async function ffmpeg(options, globalOptions, cliInstance) {
   if (action === 'exit') process.exit();
 
   switch (action) {
+
+    case 'trim_start': {
+      await trimStart();
+      break;
+    }
 
     case 'trim_end': {
       await trimEnd();
