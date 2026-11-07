@@ -11,6 +11,8 @@ function escapeFilename(inputFilenameRaw) {
     .replaceAll("\\ ", " ")
     .replaceAll("\\(", "(")
     .replaceAll("\\)", ")")
+    .replaceAll("\\[", "[")
+    .replaceAll("\\]", "]")
     .trim();
 
   return inputFilename;
@@ -476,6 +478,154 @@ async function trimStart() {
 
 }
 
+async function extractPartialVideo() {
+
+  const inputFilename = await text({
+    message: 'Enter input filename:',
+    validate: (value) => {
+      if (!value) return 'Filename is required';
+      return undefined;
+    },
+  });
+
+  const startTime = await text({
+    message: 'Enter start time:',
+    initialValue: "00:00",
+    validate: (value) => {
+      if (!value) return 'Start time is required';
+      return undefined;
+    },
+  });
+
+  const endTime = await text({
+    message: 'Enter end time:',
+    initialValue: "00:00",
+    validate: (value) => {
+      if (!value) return 'End time is required';
+      return undefined;
+    },
+  });
+
+  const fileExtension = path.extname(inputFilename);
+  const fileNameWithoutExtension = path.basename(inputFilename, path.extname(inputFilename));
+
+  const outputExtension = await text({
+    message: 'Enter output format:',
+    defaultValue: "mp4",
+    initialValue: "mp4",
+    validate: (value) => {
+      // if (!value) return '';
+      return undefined;
+    },
+  });
+
+  const outputFilename = await text({
+    message: 'Enter output filename:',
+    defaultValue: `${fileNameWithoutExtension}.${outputExtension}`,
+    initialValue: `${fileNameWithoutExtension}_partial.${outputExtension}`,
+    validate: (value) => {
+      // if (!value) return '';
+      return undefined;
+    },
+  });
+
+  if (
+    isCancel(inputFilename)
+    || isCancel(startTime)
+    || isCancel(endTime)
+    || isCancel(outputExtension)
+  ) {
+    console.log('Operation cancelled');
+    return;
+  }
+
+  // `$ ffmpeg -i input.mp4 -ss 00:00:03.000 -to 00:00:11.000 -c copy output.mp4`
+  // Reference: https://github.com/in-tech-gration/FFmpeg-Snippets#trim-and-cut
+  const execaOptions = [
+    '-i',
+    escapeFilename(inputFilename).replaceAll("'", "").trim(),
+    "-ss",
+    startTime,
+    "-to",
+    endTime,
+    "-c",
+    "copy",
+    escapeFilename(outputFilename),
+  ]
+
+  const cmd = "ffmpeg " + execaOptions.join(" ");
+
+  const confirmCommand = await confirm({
+    message: `Proceed with command: ${cmd}`,
+  });
+
+  if (!confirmCommand) {
+    return console.log("Process cancelled.");
+  }
+
+  const spin = spinner();
+  spin.start(`Extracting partial video from file (${inputFilename})...`);
+
+  await tasks([
+    {
+      title: 'Extracting partial video from file',
+      task: async () => {
+
+        try {
+          // Start command but don't wait for it yet
+          const extractPartialVideo = execa(
+            'ffmpeg',
+            execaOptions,
+            // { stdio: "inherit" }
+          );
+
+          // Handle output as it arrives
+          extractPartialVideo.stdout.on('data', (data) => {
+            // Process each chunk of output
+            console.log(data.toString().trim());
+          });
+
+          try {
+
+            await extractPartialVideo;
+            spin.stop(`Video file created: ${fileNameWithoutExtension}.${outputExtension}`);
+
+          } catch (error) {
+
+            console.error('Error:', error.message);
+            spin.stop();
+
+          }
+
+        } catch (error) {
+
+          console.log(error);
+          spin.stop();
+
+        }
+
+        return 'Partial audio extraction finished';
+      },
+    },
+    // {
+    //   title: 'Task #2',
+    //   task: async () => {
+    //     return 'Task #2 Finished';
+    //   },
+    // },
+  ]);
+
+}
+
+const ffmpegOptions = [
+  { value: 'extract_mp3', label: 'Extract MP3 audio', hint: '' },
+  { value: 'extract_wav', label: 'Extract WAV audio', hint: '' },
+  { value: 'extract_partial_video', label: 'Extract partial video', hint: '' },
+  { value: 'extract_partial_audio', label: 'Extract partial audio from video', hint: '' },
+  { value: 'trim_end', label: 'Trim end of file', hint: '' },
+  { value: 'trim_start', label: 'Trim start of file', hint: '' },
+];
+
 export default async function ffmpeg(options, globalOptions, cliInstance) {
 
   const { verbose: isVerbose } = globalOptions;
@@ -489,13 +639,7 @@ export default async function ffmpeg(options, globalOptions, cliInstance) {
 
   const action = await select({
     message: 'What would you like to do?',
-    options: [
-      { value: 'extract_mp3', label: 'Extract MP3 audio', hint: '' },
-      { value: 'extract_wav', label: 'Extract WAV audio', hint: '' },
-      { value: 'extract_partial_audio', label: 'Extract partial audio from video', hint: '' },
-      { value: 'trim_end', label: 'Trim end of file', hint: '' },
-      { value: 'trim_start', label: 'Trim start of file', hint: '' },
-    ],
+    options: ffmpegOptions,
   });
 
   if (isCancel(action)) {
@@ -514,6 +658,11 @@ export default async function ffmpeg(options, globalOptions, cliInstance) {
 
     case 'trim_end': {
       await trimEnd();
+      break;
+    }
+
+    case 'extract_partial_video': {
+      await extractPartialVideo();
       break;
     }
 
