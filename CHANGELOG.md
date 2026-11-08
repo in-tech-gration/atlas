@@ -15,9 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add spaCy 'Named Entity Recognition' plugin: `atlas -u ner`
 - Add General-purpose `atlas -u converter` plugin with support for HH:MM:SS-to-Seconds and vice versa
 - Add `--format=srt` option to YouTube transcript downloader (`--youtube`)
-- Add image OCR support in the `img` plugin: `atlas -u img ocr file.jpg`
 - Add `set_secret=provider,secret` option to Authenticator plugin
 - Add support for extracting Authenticator keys via the `otpauth://` protocol
+- Add Base64 encoding option to the `img` plugin: `atlas -u img base64 file.jpg`
+- Add image OCR support in the `img` plugin: `atlas -u img ocr file.jpg`
 
 ### Fixed
 
