@@ -114,6 +114,7 @@ const convolution = (
 }
 
 const filtersWithParams = [
+  ["base64", "(Convert to Base64)"],
   ["downscale", "[=<NUMBER>]"],
   ["ocr", " (Optical Character Recognition)"],
   ["scale", "=<NUMBER>"],
@@ -168,6 +169,23 @@ export default async function img(options) {
   }
 
   const fname = path.parse(filename);
+
+  // Convert to Base64
+  if (filter === "base64") {
+
+    const isDir = fs.lstatSync(filename).isDirectory();
+
+    // BATCH PROCESSING
+    if (isDir) {
+      // TODO
+    } else {
+      const img = fs.readFileSync(filename);
+      const base64 = Buffer.from(img).toString('base64');
+      console.log(base64);
+
+    }
+
+  }
 
   // OCR
   if (filter === "ocr") {
