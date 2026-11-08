@@ -592,7 +592,9 @@ async function extractPartialVideo() {
 
           } catch (error) {
 
-            console.error('Error:', error.message);
+            console.log(chalk.redBright('Error: ' + error.message));
+            console.log(chalk.redBright(`[ERROR CODE: ${error.code}]`));
+            // TODO: Check to see if command exists on the system.
             spin.stop();
 
           }
