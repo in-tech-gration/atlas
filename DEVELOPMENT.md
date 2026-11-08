@@ -16,6 +16,31 @@
   }
   ```
 
+## HOW TO | STORE DATA (API KEYS, etc.)
+
+  ```js
+  // GET KEY
+  const API_KEY = cliInstance.config.get('serp_api_key');
+
+  if (!API_KEY) {
+
+    console.log("ERROR: Missing SERP API Key");
+
+    // STORE KEY
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+    rl.question(`Please enter your SERP API KEY: `, key => {
+      cliInstance.config.set("serp_api_key", key);
+      console.log(`Key stored. Please run the search command again.`);
+      rl.close();
+    });
+
+    return;
+  }
+  ```
+
 ## HOW TO | CREATE A PLUGIN
 
   - Create a file inside the `plugins/` folder. Make sure it has the `.plugin.js` extension and the following structure:
